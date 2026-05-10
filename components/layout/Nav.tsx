@@ -35,7 +35,6 @@ export default function Nav({ locale }: NavProps) {
     { href: `/${locale}#concept`,    label: locale === 'he' ? 'הרעיון'    : 'Concept'    },
     { href: `/${locale}#experience`, label: locale === 'he' ? 'החוויה'    : 'Experience' },
     { href: `/${locale}#founders`,   label: locale === 'he' ? 'המדריכים'  : 'Founders'   },
-    { href: `/${locale}#retreats`,   label: locale === 'he' ? 'ריטריטים'  : 'Retreats'   },
     { href: `/${locale}/events`,     label: locale === 'he' ? 'אירועים'   : 'Events', isPage: true },
   ]
 
