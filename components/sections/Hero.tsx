@@ -28,13 +28,13 @@ export default function Hero({ locale, t: tProp }: HeroProps) {
         loop
         playsInline
         poster="/images/hero-new.jpeg"
+        className="hero-bg"
         style={{
           position: 'absolute',
           inset: 0,
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: '70% 35%',
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
