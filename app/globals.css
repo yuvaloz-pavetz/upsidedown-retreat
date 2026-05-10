@@ -259,7 +259,7 @@
   .btn-solid-gold:hover { opacity: 0.88; }
 
   .hero-bg {
-    object-position: 20% 35%;
+    object-position: 40% 35%;
   }
   @media (min-width: 640px) {
     .hero-bg {
