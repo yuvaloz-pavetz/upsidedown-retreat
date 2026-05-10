@@ -189,7 +189,7 @@ export default function Instructors({ locale, t: tProp }: InstructorsProps) {
           <p
             className="font-display font-light italic"
             style={{
-              fontSize: 'clamp(1rem, 2vw, 1.375rem)',
+              fontSize: 'clamp(1.25rem, 2.5vw, 1.875rem)',
               color: 'rgba(232,213,183,0.75)',
               lineHeight: 1.8,
               maxWidth: '680px',
