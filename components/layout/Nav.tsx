@@ -32,10 +32,10 @@ export default function Nav({ locale }: NavProps) {
   })
 
   const anchorLinks = [
-    { href: `/${locale}#concept`,    label: locale === 'he' ? 'הרעיון'    : 'Concept'    },
-    { href: `/${locale}#experience`, label: locale === 'he' ? 'החוויה'    : 'Experience' },
-    { href: `/${locale}#founders`,   label: locale === 'he' ? 'המדריכים'  : 'Founders'   },
-    { href: `/${locale}/events`,     label: locale === 'he' ? 'אירועים'   : 'Events', isPage: true },
+    { href: `/${locale}#concept`,    label: 'Concept'    },
+    { href: `/${locale}#experience`, label: 'Experience' },
+    { href: `/${locale}#founders`,   label: 'Founders'   },
+    { href: `/${locale}/events`,     label: 'Events', isPage: true },
   ]
 
   return (
