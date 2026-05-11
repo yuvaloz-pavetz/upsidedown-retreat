@@ -171,6 +171,23 @@ export const i18n = {
       gallery: 'Gallery',
       aboutRetreat: 'About This Retreat',
     },
+    about: {
+      pageTitle: 'About',
+      foundersLabel: 'The Founders',
+      teamLabel: 'The Team',
+      teamSubtext: 'Our freediving instructors bring depth, calm, and expertise to every retreat.',
+      noTeam: '',
+      yuval: {
+        name: 'Yuval Oz',
+        role: 'Handstand teacher, movement artist & performer',
+        bio: `Yuval teaches handstands through an approach that combines technique, exploration, creativity, and enjoyment of the process.\n\nWith years of experience teaching and performing, he works with practitioners of all levels — from complete beginners to advanced students — focusing on awareness, control, breathing, and efficient movement rather than simply "holding a handstand."\n\nComing from a background in acrobatics, physical theater, and performance, Yuval brings a playful, dynamic, and artistic perspective into his teaching. During the retreat, he will guide handstand sessions, technical drills, and movement exploration practices designed to help participants develop greater balance, freedom, and confidence in their bodies.`,
+      },
+      gil: {
+        name: 'Gil Fox',
+        role: 'Freediving instructor & Israeli national record holder',
+        bio: `Gil is a freediving instructor and Israeli national record holder with years of experience teaching, coaching, and guiding people both in and out of the water.\n\nHis approach to freediving combines technique, relaxation, breathing, and a deep connection to the body and the sea.\n\nBeyond the athletic aspect of freediving, Gil brings a strong sense of calm, presence, and connection to nature into his teaching. At the retreat, he will guide breathing sessions, water adaptation practices, freediving techniques, and mental training exercises designed to help participants feel more relaxed, confident, and connected in the water.`,
+      },
+    },
   },
 
   he: {
@@ -185,9 +202,9 @@ export const i18n = {
       words: ['ה', 'UPSIDEDOWN', 'ריטריט'] as [string, string, string],
       subtitle: 'ריטריט שמשלב דיוק, נשימה, משחק וטבע — לאנשים שרוצים לנוע, לחקור ולראות את העולם מזווית אחרת.',
       cta: 'אירועים קרובים',
-      titleLine1: 'ה',
-      titleLine2: 'ריטריט',
-      titleLine3: 'ההפוך',
+      titleLine1: 'Inverted',
+      titleLine2: 'Perspective.',
+      titleLine3: 'Deeper Connection.',
       essence: 'כוח. שקט. חיבור.',
       above: 'מעל',
       below: 'מתחת',
@@ -342,6 +359,23 @@ export const i18n = {
       location: 'מיקום',
       gallery: 'גלריה',
       aboutRetreat: 'על הריטריט',
+    },
+    about: {
+      pageTitle: 'About',
+      foundersLabel: 'The Founders',
+      teamLabel: 'The Team',
+      teamSubtext: 'המדריכים שלנו מביאים עומק, רוגע ומקצועיות לכל ריטריט.',
+      noTeam: '',
+      yuval: {
+        name: 'Yuval Oz',
+        role: 'Handstand teacher, movement artist & performer',
+        bio: `יובל מלמד עמידות ידיים מתוך גישה שמחברת בין טכניקה, חקירה, יצירתיות והנאה מהדרך.\n\nעם שנים של ניסיון בהוראה, פרפורמנס ועבודה עם תלמידים מכל הרמות — מהצעדים הראשונים ועד עבודה מתקדמת — הוא שם דגש על פיתוח מודעות, שליטה, נשימה ועבודה חכמה עם הגוף, ולא רק על "להחזיק עמידת ידיים".\n\nמעבר לעולם עמידות הידיים, יובל מגיע מרקע של אקרובטיקה, פרפורמנס ותיאטרון פיזי, מה שמביא לתרגולים שלו גישה משחקית, מוזיקלית ודינמית יותר. בריטריט הוא יוביל סשנים של עמידות ידיים, עבודה טכנית וחקירת תנועה — עם מטרה לעזור לכל משתתף למצוא יותר יציבות, חופש וביטחון בגוף שלו.`,
+      },
+      gil: {
+        name: 'Gil Fox',
+        role: 'Freediving instructor & Israeli national record holder',
+        bio: `גיל הוא מדריך צלילה חופשית ושיאן ישראל בצלילה חופשית, עם שנים של ניסיון בהדרכה, אימון ועבודה עם אנשים בתוך המים ומחוץ להם.\n\nהגישה שלו לצלילה משלבת טכניקה, רוגע, נשימה והיכרות עמוקה עם הגוף והים.\n\nמעבר לפן הספורטיבי, גיל מביא איתו חיבור אמיתי לטבע, לשקט ולחוויה האנושית שמאחורי הצלילה החופשית. בריטריט הוא יוביל סשנים של נשימה, הסתגלות למים, טכניקות צלילה ועבודה מנטלית — מתוך רצון לאפשר לאנשים להרגיש נינוחים, בטוחים ומחוברים יותר בתוך המים.`,
+      },
     },
   },
 }

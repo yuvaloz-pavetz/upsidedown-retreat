@@ -34,7 +34,7 @@ export default function Nav({ locale }: NavProps) {
   const anchorLinks = [
     { href: `/${locale}#concept`,    label: 'Concept'    },
     { href: `/${locale}#experience`, label: 'Experience' },
-    { href: `/${locale}#founders`,   label: 'Founders'   },
+    { href: `/${locale}/about`,       label: 'About', isPage: true },
     { href: `/${locale}/events`,     label: 'Events', isPage: true },
   ]
 

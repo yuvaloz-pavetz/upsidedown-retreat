@@ -30,3 +30,18 @@ export interface RetreatRow {
 
 export type RetreatInsert = Omit<RetreatRow, 'id' | 'created_at' | 'updated_at'>
 export type RetreatUpdate = Partial<RetreatInsert>
+
+export interface TeamMember {
+  id: string
+  name: string
+  role: string
+  bio: string
+  photo_url: string | null
+  display_order: number
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type TeamMemberInsert = Omit<TeamMember, 'id' | 'created_at' | 'updated_at'>
+export type TeamMemberUpdate = Partial<TeamMemberInsert>
