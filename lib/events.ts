@@ -40,6 +40,50 @@ export type Event = {
 
 export const events: Event[] = [
   {
+    // Venue data for the September 2026 Crete retreat (main data lives in Supabase)
+    slug: 'crete-09-2026',
+    status: 'open',
+    title: { en: '', he: '' },
+    location: { en: 'Terra Preveli, Crete', he: 'טרה פרבלי, כרתים' },
+    dates: { en: '', he: '' },
+    year: 2026,
+    duration: { en: '', he: '' },
+    pricingILS: '',
+    pricingEUR: '',
+    spotsRemaining: 0,
+    spotsTotal: 0,
+    heroImage: 'https://upsidedown-retreat.com/wp-content/uploads/2025/05/IMG_1592-scaled.jpg',
+    galleryImages: [],
+    description: { en: '', he: '' },
+    includes: { en: [], he: [] },
+    venueDescriptionEn: `Terra Preveli is an off-grid eco-farm on a Cretan hillside, running entirely on solar power. Olive groves, wild herbs, and a stream that winds through the property and pools into natural swimming holes before reaching Preveli Lagoon — where freshwater meets the Mediterranean under a canopy of towering palms.
+
+Accommodation is in eco-structures built into the landscape: geodesic domes, a hand-built mud house, and yurts. They're open to the breeze, simple in the best sense, and genuinely comfortable once you settle in. Bathrooms and showers are shared and well-maintained. There's no air conditioning — but at this altitude, the nights cool down on their own.
+
+This is a place where mornings start with birdsong and the afternoons end at the stream. Where the absence of city noise becomes something you notice, then miss when you leave. It suits people who come for the experience, not the amenities — and leave with both.`,
+    venueDescriptionHe: `טרה פרבלי היא חוות אקו אוף-דה-גריד על גבעה כרתית, שפועלת כולה על אנרגיה סולרית. עצי זית, עשבי בר, ונחל שעובר בשטח ויוצר בריכות שחייה טבעיות לפני שמגיע ללגונה של פרבלי — שם מים מתוקים פוגשים את הים התיכון מתחת לחופת עצי דקל.
+
+הלינה היא במבנים אקולוגיים: דומים גאומטריים, בית בוץ בנוי ביד, ויורטים. הם פתוחים לרוח, פשוטים במובן הטוב, ומרגישים בבית אחרי שמסתדרים. שירותים ומקלחות משותפים ומתוחזקים. אין מיזוג אוויר — אבל בגובה הזה, הלילות מתקררים מעצמם.
+
+זה מקום שבו הבוקר מתחיל בצפצופי ציפורים, ואחר הצהריים נגמר בנחל. שבו ההיעדר של רעש עירוני הופך למשהו שמרגישים, ואחר כך מתגעגעים אליו. מתאים לאנשים שמגיעים לחוויה, לא לנוחיות — ויוצאים עם שניהם.`,
+    venueImages: [
+      'https://terrapreveli.com/wp-content/uploads/2023/11/20230428_174002-scaled.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2023/05/20230430_125621.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2023/11/WhatsApp-Image-2023-11-03-at-09.18.42.jpeg',
+      'https://terrapreveli.com/wp-content/uploads/2024/01/IMG_20200418_101748-scaled.jpeg',
+      'https://terrapreveli.com/wp-content/uploads/2023/05/20230428_173741.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2024/03/20230430_100930.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2023/05/20230428_125046.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2023/05/20230428_130044.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2023/05/20230430_150647.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2023/05/20230430_151740.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2024/03/DSC02620.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2024/03/DSC02567.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2025/01/terrapreveli-1-scaled.jpg',
+      'https://terrapreveli.com/wp-content/uploads/2025/01/terrapreveli-5-scaled.jpg',
+    ],
+  },
+  {
     slug: 'crete-june-2025',
     status: 'open',
     title: {
