@@ -6,6 +6,7 @@ import AccessibilityWidget from '@/components/ui/AccessibilityWidget'
 import MetaPixel from '@/components/analytics/MetaPixel'
 import Clarity from '@/components/analytics/Clarity'
 import { GTMScript, GTMNoScript } from '@/components/analytics/GTM'
+import GA4 from '@/components/analytics/GA4'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -84,6 +85,7 @@ export default async function LocaleLayout({
         {children}
         <AccessibilityWidget locale={locale as Locale} />
         <GTMScript />
+        <GA4 />
         <MetaPixel />
         <Clarity />
       </body>
