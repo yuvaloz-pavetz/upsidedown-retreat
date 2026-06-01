@@ -1,0 +1,109 @@
+/* ── Admin panel — mobile responsive ───────────────────────────── */
+
+/* Mobile top bar — hidden on desktop */
+.admin-mobile-bar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: #090f1a;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  z-index: 100;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.5rem;
+}
+
+/* Bottom nav kept for reference — unused */
+.admin-bottom-nav { display: none; }
+
+@media (max-width: 767px) {
+  /* Shell */
+  .admin-sidebar    { display: none !important; }
+  .admin-mobile-bar { display: flex; }
+  .admin-main       { padding: calc(52px + 1rem) 1rem 2rem 1rem !important; }
+
+  /* CRM — 2-col grid → single col */
+  .crm-grid { display: block !important; }
+
+  /* CRM — event sidebar → horizontal pill scroller */
+  .crm-event-sidebar {
+    display: flex !important;
+    flex-direction: row !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 0.35rem !important;
+    margin-bottom: 0.75rem !important;
+    padding-bottom: 0.3rem !important;
+    flex-wrap: nowrap !important;
+  }
+  .crm-event-sidebar::-webkit-scrollbar { display: none; }
+  .crm-event-sidebar > button {
+    flex-shrink: 0 !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255,255,255,0.09) !important;
+    white-space: nowrap !important;
+    width: auto !important;
+    padding: 0.4rem 0.9rem !important;
+    text-align: center !important;
+    display: inline-block !important;
+  }
+
+  /* CRM — table hidden on mobile, cards shown */
+  .crm-table-view { display: none !important; }
+  .crm-card-view  { display: flex !important; }
+
+  /* CRM — page header stacks */
+  .crm-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.6rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  /* CRM — add form: 2-col → 1-col */
+  .crm-add-name-grid    { grid-template-columns: 1fr !important; }
+  .crm-add-contact-grid { grid-template-columns: 1fr !important; }
+
+  /* Budget — 2-col grid → single col */
+  .budget-grid    { display: block !important; }
+  .budget-sidebar { display: none !important; }
+  .budget-select-mobile { display: block !important; }
+
+  /* CRM — filter bar touch targets */
+  .crm-filter-bar { gap: 0.4rem !important; margin-bottom: 1rem !important; }
+  .crm-filter-bar > button { min-height: 40px !important; padding: 0.45rem 0.9rem !important; font-size: 0.75rem !important; }
+
+  /* Payments panel — row → two stacked lines */
+  .payment-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.45rem !important;
+    padding-bottom: 0.65rem !important;
+    margin-bottom: 0.65rem !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+  }
+  .payment-inputs {
+    display: flex !important;
+    gap: 0.4rem !important;
+    align-items: center !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+  .payment-controls {
+    display: flex !important;
+    gap: 0.55rem !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .crm-card-view        { display: none !important; }
+  .budget-select-mobile { display: none !important; }
+  .payment-inputs       { display: contents !important; }
+  .payment-controls     { display: contents !important; }
+}
