@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getAllRetreats } from '@/lib/retreats'
 
-const BASE = 'https://upsidedownretreat.com'
+const BASE = 'https://upsidedown-retreat.com'
 const LOCALES = ['en', 'he'] as const
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

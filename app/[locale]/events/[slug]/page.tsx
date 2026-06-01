@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import type { Locale } from '@/lib/i18n'
-import { getRetreatBySlug } from '@/lib/retreats'
+import { getRetreatBySlug, enrichEarlyBird } from '@/lib/retreats'
 import { getEventBySlug } from '@/lib/events'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getSiteContentMap, buildI18n } from '@/lib/content'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
@@ -15,7 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params
   const loc = (locale === 'he' ? 'he' : 'en') as Locale
-  const event = await getRetreatBySlug(slug).catch(() => getEventBySlug(slug) ?? null)
+  const event = await getRetreatBySlug(slug).then(r => r ?? getEventBySlug(slug) ?? null).catch(() => getEventBySlug(slug) ?? null)
   if (!event) return { title: 'Retreat Not Found' }
 
   const description = event.description[loc].replace(/\n/g, ' ').slice(0, 155)
@@ -56,12 +57,22 @@ export default async function EventPage({
   const { locale, slug } = await params
   const loc = (locale === 'he' ? 'he' : 'en') as Locale
 
-  const [event, contentMap] = await Promise.all([
-    getRetreatBySlug(slug).catch(() => getEventBySlug(slug) ?? null),
+  const [rawEvent, contentMap] = await Promise.all([
+    getRetreatBySlug(slug).then(r => r ?? getEventBySlug(slug) ?? null).catch(() => getEventBySlug(slug) ?? null),
     getSiteContentMap(loc),
   ])
 
-  if (!event) notFound()
+  if (!rawEvent) notFound()
+
+  // Compute early bird active status
+  const paidBySlug: Record<string, number> = {}
+  try {
+    const admin = createAdminClient()
+    const { data } = await admin.from('leads').select('event_slug').in('status', ['partially_paid', 'paid']).eq('event_slug', slug)
+    paidBySlug[slug] = data?.length ?? 0
+  } catch { /* leads table may not exist */ }
+
+  const [event] = enrichEarlyBird([rawEvent], paidBySlug)
 
   const content = buildI18n(loc, contentMap)
 
@@ -77,7 +88,7 @@ export default async function EventPage({
     organizer: {
       '@type': 'Organization',
       name: 'UpsideDown Retreat',
-      url: 'https://upsidedownretreat.com',
+      url: 'https://upsidedown-retreat.com',
     },
     offers: {
       '@type': 'Offer',
@@ -89,12 +100,12 @@ export default async function EventPage({
           : 'https://schema.org/InStock',
     },
     image: event.heroImage
-      ? `https://upsidedownretreat.com${event.heroImage}`
+      ? `https://upsidedown-retreat.com${event.heroImage}`
       : undefined,
   }
 
   return (
-    <main>
+    <main id="main-content">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

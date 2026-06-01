@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { Locale } from '@/lib/i18n'
-import { getOpenRetreats } from '@/lib/retreats'
+import { getOpenRetreats, enrichEarlyBird } from '@/lib/retreats'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { events as staticEvents } from '@/lib/events'
 import { getSiteContentMap, buildI18n } from '@/lib/content'
 import Nav from '@/components/layout/Nav'
@@ -13,6 +14,8 @@ import Instructors from '@/components/sections/Instructors'
 import WhoFor from '@/components/sections/WhoFor'
 import UpcomingRetreat from '@/components/sections/UpcomingRetreat'
 import Gallery from '@/components/sections/Gallery'
+import Testimonials from '@/components/sections/Testimonials'
+import Newsletter from '@/components/sections/Newsletter'
 import FAQ from '@/components/sections/FAQ'
 import FinalCta from '@/components/sections/FinalCta'
 
@@ -50,10 +53,23 @@ export default async function Home({
   const { locale } = await params
   const loc = (locale === 'he' ? 'he' : 'en') as Locale
 
-  const [contentMap, openRetreats] = await Promise.all([
+  const [contentMap, rawRetreats] = await Promise.all([
     getSiteContentMap(loc),
     getOpenRetreats().catch(() => staticEvents.filter(e => e.status === 'open' || e.status === 'coming-soon' || e.status === 'last-spots')),
   ])
+
+  const paidBySlug: Record<string, number> = {}
+  try {
+    const admin = createAdminClient()
+    const { data: leadCounts } = await admin.from('leads').select('event_slug').in('status', ['partially_paid', 'paid'])
+    if (leadCounts) {
+      for (const l of leadCounts) {
+        paidBySlug[l.event_slug] = (paidBySlug[l.event_slug] ?? 0) + 1
+      }
+    }
+  } catch { /* leads table may not exist */ }
+
+  const openRetreats = enrichEarlyBird(rawRetreats, paidBySlug)
 
   const content = buildI18n(loc, contentMap)
 
@@ -61,13 +77,13 @@ export default async function Home({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'UpsideDown Retreat',
-    url: 'https://upsidedownretreat.com',
+    url: 'https://upsidedown-retreat.com',
     description: content.hero.subtitle,
     sameAs: [],
   }
 
   return (
-    <main>
+    <main id="main-content">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -79,8 +95,10 @@ export default async function Home({
       <WhyDifferent locale={loc} />
       <Instructors locale={loc} t={content.instructors} />
       <WhoFor locale={loc} />
+      <Testimonials locale={loc} />
       <UpcomingRetreat locale={loc} events={openRetreats} t={{ sectionLabel: content.retreat.sectionLabel }} />
       <Gallery locale={loc} t={content.gallery} />
+      <Newsletter locale={loc} />
       <FAQ locale={loc} />
       <FinalCta locale={loc} t={content.finalCta} />
       <Footer locale={loc} />

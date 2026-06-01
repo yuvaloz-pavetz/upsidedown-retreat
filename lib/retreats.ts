@@ -1,5 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { Event } from '@/lib/events'
+import { getEventBySlug } from '@/lib/events'
 import type { RetreatRow } from '@/lib/supabase/types'
 
 export function rowToEvent(row: RetreatRow): Event {
@@ -11,7 +12,7 @@ export function rowToEvent(row: RetreatRow): Event {
     dates: { en: row.dates_en, he: row.dates_he },
     year: row.year,
     duration: { en: row.duration_en, he: row.duration_he },
-    pricingILS: row.pricing_ils,
+    pricingILS: row.pricing_ils ?? '',
     pricingEUR: row.pricing_eur,
     spotsRemaining: row.spots_remaining,
     spotsTotal: row.spots_total,
@@ -19,11 +20,44 @@ export function rowToEvent(row: RetreatRow): Event {
     galleryImages: row.gallery_images,
     description: { en: row.description_en, he: row.description_he },
     includes: { en: row.includes_en, he: row.includes_he },
+    venueDescriptionEn: row.venue_description_en,
+    venueDescriptionHe: row.venue_description_he,
+    venueImages: row.venue_images,
+    instagramUrls: row.instagram_urls,
+    instagramUrlsEn: row.instagram_urls_en,
+    instagramUrlsHe: row.instagram_urls_he,
+    whoForEn: row.who_for_en,
+    whoForHe: row.who_for_he,
+    tiers: row.tiers,
+    earlyBirdEnabled:     row.early_bird_enabled     ?? false,
+    earlyBirdDiscountEUR: row.early_bird_discount_eur ?? null,
+    earlyBirdDiscountILS: row.early_bird_discount_ils ?? null,
+    earlyBirdSpots:       row.early_bird_spots        ?? null,
+    earlyBirdDeadline:    row.early_bird_deadline     ?? null,
   }
 }
 
+function computeEarlyBirdActive(event: import('@/lib/events').Event, paidCount: number): boolean {
+  if (!event.earlyBirdEnabled) return false
+  if (event.earlyBirdSpots != null && paidCount >= event.earlyBirdSpots) return false
+  if (event.earlyBirdDeadline && new Date(event.earlyBirdDeadline) < new Date()) return false
+  return true
+}
+
+export function enrichEarlyBird(
+  events: import('@/lib/events').Event[],
+  paidBySlug: Record<string, number>,
+): import('@/lib/events').Event[] {
+  return events.map(e => {
+    const paid = paidBySlug[e.slug] ?? 0
+    const active = computeEarlyBirdActive(e, paid)
+    const spotsRemaining = e.earlyBirdSpots != null ? Math.max(0, e.earlyBirdSpots - paid) : undefined
+    return { ...e, earlyBirdActive: active, earlyBirdSpotsRemaining: spotsRemaining }
+  })
+}
+
 export async function getAllRetreats(): Promise<Event[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('retreats')
     .select('*')
@@ -35,7 +69,7 @@ export async function getAllRetreats(): Promise<Event[]> {
 }
 
 export async function getRetreatBySlug(slug: string): Promise<Event | null> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('retreats')
     .select('*')
@@ -43,11 +77,25 @@ export async function getRetreatBySlug(slug: string): Promise<Event | null> {
     .single()
 
   if (error || !data) return null
-  return rowToEvent(data)
+  const event = rowToEvent(data)
+  const staticEvent = getEventBySlug(slug)
+  if (staticEvent) {
+    if (!event.heroImage?.startsWith('http') && staticEvent.heroImage?.startsWith('http')) event.heroImage = staticEvent.heroImage
+    if (!event.venueImages?.length && staticEvent.venueImages?.length) event.venueImages = staticEvent.venueImages
+    if (!event.venueDescriptionEn && staticEvent.venueDescriptionEn) event.venueDescriptionEn = staticEvent.venueDescriptionEn
+    if (!event.venueDescriptionHe && staticEvent.venueDescriptionHe) event.venueDescriptionHe = staticEvent.venueDescriptionHe
+    if (!event.instagramUrls?.length && staticEvent.instagramUrls?.length) event.instagramUrls = staticEvent.instagramUrls
+    if (staticEvent.galleryImages?.length) {
+      const existing = new Set(event.galleryImages)
+      const extra = staticEvent.galleryImages.filter(img => !existing.has(img))
+      if (extra.length) event.galleryImages = [...event.galleryImages, ...extra]
+    }
+  }
+  return event
 }
 
 export async function getOpenRetreats(): Promise<Event[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('retreats')
     .select('*')

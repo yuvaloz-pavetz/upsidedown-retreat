@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Cormorant_Garamond, Manrope, Frank_Ruhl_Libre, Heebo } from 'next/font/google'
 import type { Locale } from '@/lib/i18n'
 import LocaleDetector from '@/components/LocaleDetector'
+import AccessibilityWidget from '@/components/ui/AccessibilityWidget'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -33,7 +34,7 @@ const heebo = Heebo({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://upsidedownretreat.com'),
+  metadataBase: new URL('https://upsidedown-retreat.com'),
   title: {
     template: '%s | The UpsideDown Retreat',
     default: 'The UpsideDown Retreat — Handstands & Freediving',
@@ -65,11 +66,19 @@ export default async function LocaleLayout({
     heebo.variable,
   ].join(' ')
 
+  const skipLabel = isHe ? 'דלג לתוכן הראשי' : 'Skip to main content'
+
   return (
     <html lang={locale} dir={dir} className={fontClasses} data-scroll-behavior="smooth">
       <body>
+        {/* Skip navigation — visually hidden, appears on focus (WCAG 2.4.1 / SI 5568) */}
+        <a href="#main-content" className="skip-link">
+          {skipLabel}
+        </a>
+
         <LocaleDetector currentLocale={locale as Locale} />
         {children}
+        <AccessibilityWidget locale={locale as Locale} />
       </body>
     </html>
   )

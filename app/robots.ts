@@ -5,6 +5,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       { userAgent: '*', allow: '/', disallow: '/admin/' },
     ],
-    sitemap: 'https://upsidedownretreat.com/sitemap.xml',
+    sitemap: 'https://upsidedown-retreat.com/sitemap.xml',
   }
 }
