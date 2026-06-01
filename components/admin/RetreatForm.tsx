@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { RetreatRow, RetreatInsert, RetreatStatus } from '@/lib/supabase/types'
+import { SingleImageUploader, MultiImageUploader } from '@/components/admin/ImageUploader'
+import TierEditor from '@/components/admin/TierEditor'
+import type { PricingTier } from '@/lib/supabase/types'
 
 interface RetreatFormProps {
   retreat?: RetreatRow
@@ -64,6 +67,26 @@ export default function RetreatForm({ retreat }: RetreatFormProps) {
   const router = useRouter()
   const isEdit = !!retreat
 
+  const [venueDescEn, setVenueDescEn] = useState(retreat?.venue_description_en ?? '')
+  const [venueDescHe, setVenueDescHe] = useState(retreat?.venue_description_he ?? '')
+  const [venueImages, setVenueImages] = useState<string[]>(retreat?.venue_images ?? [])
+  const [whoForEn, setWhoForEn] = useState(retreat?.who_for_en ?? '')
+  const [whoForHe, setWhoForHe] = useState(retreat?.who_for_he ?? '')
+  const [igUrlsEn, setIgUrlsEn] = useState<string[]>(retreat?.instagram_urls_en ?? [])
+  const [igUrlsHe, setIgUrlsHe] = useState<string[]>(retreat?.instagram_urls_he ?? [])
+  const [tiers, setTiers] = useState<PricingTier[]>(retreat?.tiers ?? [])
+  const [pricingMode, setPricingMode] = useState<'single' | 'tiers'>(
+    retreat?.tiers && retreat.tiers.length > 0 ? 'tiers' : 'single'
+  )
+
+  const [earlyBird, setEarlyBird] = useState({
+    enabled:      retreat?.early_bird_enabled      ?? false,
+    discount_eur: retreat?.early_bird_discount_eur != null ? String(retreat.early_bird_discount_eur) : '',
+    discount_ils: retreat?.early_bird_discount_ils != null ? String(retreat.early_bird_discount_ils) : '',
+    spots:        retreat?.early_bird_spots        != null ? String(retreat.early_bird_spots) : '',
+    deadline:     retreat?.early_bird_deadline     ?? '',
+  })
+
   const [form, setForm] = useState<RetreatInsert>({
     slug: retreat?.slug ?? '',
     status: retreat?.status ?? 'coming-soon',
@@ -103,14 +126,36 @@ export default function RetreatForm({ retreat }: RetreatFormProps) {
     setSaving(true)
     const supabase = createClient()
 
+    const activeTiers = pricingMode === 'tiers' ? tiers : []
+    let pricingEur = form.pricing_eur
+    if (pricingMode === 'tiers' && activeTiers.length > 0) {
+      const nums = activeTiers.map(t => parseFloat(t.price_eur.replace(/[^0-9.]/g, ''))).filter(n => !isNaN(n))
+      if (nums.length > 0) pricingEur = String(Math.min(...nums))
+    }
+
+    const payload = {
+      ...form,
+      pricing_eur: pricingEur,
+      venue_description_en: venueDescEn,
+      venue_description_he: venueDescHe,
+      venue_images: venueImages,
+      who_for_en: whoForEn,
+      who_for_he: whoForHe,
+      instagram_urls_en: igUrlsEn.filter(Boolean),
+      instagram_urls_he: igUrlsHe.filter(Boolean),
+      tiers: activeTiers,
+      early_bird_enabled: earlyBird.enabled,
+      early_bird_discount_eur: earlyBird.discount_eur ? Number(earlyBird.discount_eur) : null,
+      early_bird_discount_ils: earlyBird.discount_ils ? Number(earlyBird.discount_ils) : null,
+      early_bird_spots: earlyBird.spots ? Number(earlyBird.spots) : null,
+      early_bird_deadline: earlyBird.deadline || null,
+    }
+
     if (isEdit) {
-      const { error } = await supabase
-        .from('retreats')
-        .update(form)
-        .eq('id', retreat!.id)
+      const { error } = await supabase.from('retreats').update(payload).eq('id', retreat!.id)
       if (error) { setError(error.message); setSaving(false); return }
     } else {
-      const { error } = await supabase.from('retreats').insert(form)
+      const { error } = await supabase.from('retreats').insert(payload)
       if (error) { setError(error.message); setSaving(false); return }
     }
 
@@ -237,15 +282,63 @@ export default function RetreatForm({ retreat }: RetreatFormProps) {
       {/* Pricing & Spots */}
       <section style={sectionStyle}>
         <h2 style={sectionHeading}>Pricing & Spots</h2>
+
+        {/* Mode toggle */}
+        <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px' }}>
+          <p style={{ fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(226,232,240,0.35)', marginBottom: '0.75rem' }}>Pricing type</p>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              type="button"
+              onClick={() => setPricingMode('single')}
+              style={{
+                padding: '0.5rem 1.2rem', borderRadius: '4px', fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.15s',
+                border: `1px solid ${pricingMode === 'single' ? 'rgba(212,168,83,0.6)' : 'rgba(255,255,255,0.12)'}`,
+                background: pricingMode === 'single' ? 'rgba(212,168,83,0.12)' : 'rgba(255,255,255,0.02)',
+                color: pricingMode === 'single' ? '#D4A853' : 'rgba(226,232,240,0.55)',
+                fontWeight: pricingMode === 'single' ? 600 : 400,
+              }}
+            >
+              Single price
+            </button>
+            <button
+              type="button"
+              onClick={() => setPricingMode('tiers')}
+              style={{
+                padding: '0.5rem 1.2rem', borderRadius: '4px', fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.15s',
+                border: `1px solid ${pricingMode === 'tiers' ? 'rgba(212,168,83,0.6)' : 'rgba(255,255,255,0.12)'}`,
+                background: pricingMode === 'tiers' ? 'rgba(212,168,83,0.12)' : 'rgba(255,255,255,0.02)',
+                color: pricingMode === 'tiers' ? '#D4A853' : 'rgba(226,232,240,0.55)',
+                fontWeight: pricingMode === 'tiers' ? 600 : 400,
+              }}
+            >
+              Multiple tiers (rooms)
+            </button>
+          </div>
+        </div>
+
+        {pricingMode === 'single' && (
+          <div style={{ ...grid2, marginBottom: '1.25rem' }}>
+            <div>
+              <label style={labelStyle}>Price ILS <span style={{ color: 'rgba(232,213,183,0.3)', fontWeight: 400 }}>(optional)</span></label>
+              <input value={form.pricing_ils ?? ''} onChange={e => set('pricing_ils', e.target.value)} placeholder="₪3,500 — leave empty for EUR only" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Price EUR *</label>
+              <input value={form.pricing_eur} onChange={e => set('pricing_eur', e.target.value)} placeholder="€890" style={inputStyle} />
+            </div>
+          </div>
+        )}
+
+        {pricingMode === 'tiers' && (
+          <div style={{ marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.72rem', color: 'rgba(226,232,240,0.3)', marginBottom: '1rem' }}>
+              Each room type has its own price. Early Bird discount is subtracted from whichever room the visitor selects.
+            </p>
+            <TierEditor tiers={tiers} onChange={setTiers} slug={form.slug} />
+          </div>
+        )}
+
         <div style={grid2}>
-          <div>
-            <label style={labelStyle}>Price ILS *</label>
-            <input value={form.pricing_ils} onChange={e => set('pricing_ils', e.target.value)} required placeholder="₪3,500" style={inputStyle} />
-          </div>
-          <div>
-            <label style={labelStyle}>Price EUR *</label>
-            <input value={form.pricing_eur} onChange={e => set('pricing_eur', e.target.value)} required placeholder="€890" style={inputStyle} />
-          </div>
           <div>
             <label style={labelStyle}>Spots Remaining *</label>
             <input type="number" value={form.spots_remaining} onChange={e => set('spots_remaining', Number(e.target.value))} required min={0} style={inputStyle} />
@@ -257,25 +350,96 @@ export default function RetreatForm({ retreat }: RetreatFormProps) {
         </div>
       </section>
 
+      {/* Early Bird */}
+      <section style={sectionStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+          <h2 style={{ ...sectionHeading, margin: 0 }}>Early Bird</h2>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={earlyBird.enabled}
+              onChange={e => setEarlyBird(p => ({ ...p, enabled: e.target.checked }))}
+              style={{ accentColor: '#D4A853', width: '15px', height: '15px', cursor: 'pointer' }}
+            />
+            <span style={{ fontSize: '0.78rem', color: earlyBird.enabled ? '#D4A853' : 'rgba(226,232,240,0.35)' }}>
+              {earlyBird.enabled ? 'Active' : 'Disabled'}
+            </span>
+          </label>
+        </div>
+
+        {earlyBird.enabled && (
+          <>
+            <div style={grid2}>
+              <div>
+                <label style={labelStyle}>Discount EUR <span style={{ color: 'rgba(232,213,183,0.3)', fontWeight: 400, textTransform: 'none' }}>{pricingMode === 'tiers' ? '(amount off each room, e.g. 150)' : '(amount off, e.g. 150)'}</span></label>
+                <input
+                  type="number"
+                  min={0}
+                  value={earlyBird.discount_eur}
+                  onChange={e => setEarlyBird(p => ({ ...p, discount_eur: e.target.value }))}
+                  placeholder="150"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Discount ILS <span style={{ color: 'rgba(232,213,183,0.3)', fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                <input
+                  type="number"
+                  min={0}
+                  value={earlyBird.discount_ils}
+                  onChange={e => setEarlyBird(p => ({ ...p, discount_ils: e.target.value }))}
+                  placeholder="600"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Spots at Early Bird price</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={earlyBird.spots}
+                  onChange={e => setEarlyBird(p => ({ ...p, spots: e.target.value }))}
+                  placeholder="4"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Deadline <span style={{ color: 'rgba(232,213,183,0.3)', fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                <input
+                  type="date"
+                  value={earlyBird.deadline}
+                  onChange={e => setEarlyBird(p => ({ ...p, deadline: e.target.value }))}
+                  style={{ ...inputStyle, colorScheme: 'dark' }}
+                />
+              </div>
+            </div>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.72rem', color: 'rgba(226,232,240,0.25)', lineHeight: 1.5 }}>
+              Early bird closes automatically once <strong style={{ color: 'rgba(226,232,240,0.45)' }}>{earlyBird.spots || '?'} leads</strong> have made at least a first payment (Partial or Paid status in CRM)
+              {earlyBird.deadline ? `, or on ${earlyBird.deadline}` : ''}.
+            </p>
+          </>
+        )}
+      </section>
+
       {/* Images */}
       <section style={sectionStyle}>
         <h2 style={sectionHeading}>Images</h2>
         <div>
-          <label style={labelStyle}>Hero Image URL *</label>
-          <input value={form.hero_image} onChange={e => set('hero_image', e.target.value)} required placeholder="/images/retreat-session.jpg" style={inputStyle} />
-          {form.hero_image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={form.hero_image} alt="hero preview" style={{ marginTop: '0.75rem', height: '120px', objectFit: 'cover', borderRadius: '4px', opacity: 0.8 }} />
-          )}
+          <label style={labelStyle}>Hero Image</label>
+          <p style={{ fontSize: '0.68rem', color: 'rgba(226,232,240,0.25)', marginBottom: '0.5rem' }}>Full-bleed background on the event page header.</p>
+          <SingleImageUploader
+            folder={`events/${form.slug || 'new'}`}
+            value={form.hero_image}
+            onChange={url => set('hero_image', url)}
+          />
         </div>
-        <div style={{ marginTop: '1.25rem' }}>
-          <label style={labelStyle}>Gallery Images (one URL per line)</label>
-          <textarea
-            value={form.gallery_images.join('\n')}
-            onChange={e => set('gallery_images', e.target.value.split('\n').filter(Boolean))}
-            rows={4}
-            placeholder="/images/photo1.jpg&#10;/images/photo2.jpg"
-            style={{ ...inputStyle, resize: 'vertical' }}
+        <div style={{ marginTop: '1.5rem' }}>
+          <label style={labelStyle}>Gallery</label>
+          <p style={{ fontSize: '0.68rem', color: 'rgba(226,232,240,0.25)', marginBottom: '0.5rem' }}>Shown in the photo gallery section. First image = cover.</p>
+          <MultiImageUploader
+            folder={`events/${form.slug || 'new'}/gallery`}
+            value={form.gallery_images}
+            onChange={urls => set('gallery_images', urls)}
           />
         </div>
       </section>
@@ -320,6 +484,57 @@ export default function RetreatForm({ retreat }: RetreatFormProps) {
             items={form.includes_he}
             onChange={items => set('includes_he', items)}
           />
+        </div>
+      </section>
+
+      {/* Who is it for */}
+      <section style={sectionStyle}>
+        <h2 style={sectionHeading}>Who Is It For</h2>
+        <p style={{ fontSize: '0.72rem', color: 'rgba(226,232,240,0.3)', marginBottom: '1rem' }}>Shown in the "Who is it for" section on the event page. Leave blank to use default copy.</p>
+        <div style={grid2}>
+          <div>
+            <label style={labelStyle}>English</label>
+            <textarea value={whoForEn} onChange={e => setWhoForEn(e.target.value)} rows={5} placeholder="For the curious and capable..." style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+          <div>
+            <label style={labelStyle}>Hebrew</label>
+            <textarea value={whoForHe} onChange={e => setWhoForHe(e.target.value)} rows={5} dir="rtl" placeholder="לאנשים סקרנים ומסוגלים..." style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+        </div>
+      </section>
+
+      {/* Venue */}
+      <section style={sectionStyle}>
+        <h2 style={sectionHeading}>Venue & Space</h2>
+        <p style={{ fontSize: '0.72rem', color: 'rgba(226,232,240,0.3)', marginBottom: '1rem' }}>Shown in the "The Venue" section. Add venue photos and a description of the specific space.</p>
+        <div style={grid2}>
+          <div>
+            <label style={labelStyle}>Venue Description EN</label>
+            <textarea value={venueDescEn} onChange={e => setVenueDescEn(e.target.value)} rows={6} placeholder="Set on a hillside above the Aegean..." style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+          <div>
+            <label style={labelStyle}>Venue Description HE</label>
+            <textarea value={venueDescHe} onChange={e => setVenueDescHe(e.target.value)} rows={6} dir="rtl" placeholder="ממוקם על גבעה מעל האגאי..." style={{ ...inputStyle, resize: 'vertical' }} />
+          </div>
+        </div>
+        <div style={{ marginTop: '1.25rem' }}>
+          <label style={labelStyle}>Venue Photos</label>
+          <p style={{ fontSize: '0.68rem', color: 'rgba(226,232,240,0.25)', marginBottom: '0.5rem' }}>First photo becomes the large feature image.</p>
+          <MultiImageUploader
+            folder={`events/${form.slug || 'new'}/venue`}
+            value={venueImages}
+            onChange={setVenueImages}
+          />
+        </div>
+      </section>
+
+      {/* Instagram */}
+      <section style={sectionStyle}>
+        <h2 style={sectionHeading}>Instagram Videos</h2>
+        <p style={{ fontSize: '0.72rem', color: 'rgba(226,232,240,0.3)', marginBottom: '1rem' }}>Paste full Instagram post/reel URLs (e.g. https://www.instagram.com/reel/ABC123/). EN for English visitors, HE for Hebrew. Leave both empty to hide the section.</p>
+        <div style={grid2}>
+          <ListEditor label="Instagram URLs — English" items={igUrlsEn} onChange={setIgUrlsEn} />
+          <ListEditor label="Instagram URLs — עברית" items={igUrlsHe} onChange={setIgUrlsHe} />
         </div>
       </section>
 

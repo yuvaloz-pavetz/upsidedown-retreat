@@ -72,7 +72,7 @@ function FounderPanel({
 
         {/* Portrait column */}
         <motion.div
-          initial={{ opacity: 0, scale: 1.03 }}
+          initial={{ scale: 1.03 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 1.1, ease }}
@@ -86,7 +86,7 @@ function FounderPanel({
         >
           <Image
             src={photo}
-            alt={name}
+            alt=""
             fill
             style={{ objectFit: 'cover', objectPosition: 'center top', opacity: 0.82 }}
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -125,10 +125,10 @@ function FounderPanel({
             <span
               style={{
                 fontFamily: 'var(--font-cormorant), Georgia, serif',
-                fontSize: '11px',
+                fontSize: '13px',
                 letterSpacing: '0.18em',
-                color: 'rgba(255,255,255,0.35)',
-                fontWeight: 400,
+                color: 'rgba(255,255,255,0.7)',
+                fontWeight: 500,
               }}
             >
               {idx}
@@ -136,13 +136,13 @@ function FounderPanel({
             <span
               style={{
                 display: 'inline-block',
-                fontSize: '9px',
+                fontSize: '12px',
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
                 color: '#D4A853',
                 fontWeight: 600,
-                border: '1px solid rgba(212,168,83,0.35)',
-                padding: '0.25rem 0.65rem',
+                border: '1px solid rgba(212,168,83,0.6)',
+                padding: '0.3rem 0.7rem',
               }}
             >
               {discipline}
@@ -171,7 +171,7 @@ function FounderPanel({
             >
               {name}
             </h2>
-            <p style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,213,183,0.45)', marginTop: '0.35rem' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(232,213,183,0.78)', marginTop: '0.35rem', fontWeight: 500 }}>
               {role}
             </p>
           </div>
@@ -179,7 +179,7 @@ function FounderPanel({
 
         {/* Text column */}
         <motion.div
-          initial={{ opacity: 0, x: flip ? -24 : 24 }}
+          initial={{ x: flip ? -24 : 24 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.9, delay: 0.15, ease }}
@@ -208,12 +208,12 @@ function FounderPanel({
             </h2>
             <p
               style={{
-                fontSize: '11px',
+                fontSize: '13px',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: 'rgba(232,213,183,0.4)',
+                color: 'rgba(232,213,183,0.78)',
                 marginTop: '0.75rem',
-                fontWeight: 400,
+                fontWeight: 500,
               }}
             >
               {role}
@@ -229,10 +229,10 @@ function FounderPanel({
               <p
                 key={j}
                 style={{
-                  fontSize: 'clamp(14px, 1.35vw, 16px)',
+                  fontSize: 'clamp(15px, 1.35vw, 16px)',
                   lineHeight: 1.85,
-                  color: j === 0 ? 'rgba(232,213,183,0.72)' : 'rgba(232,213,183,0.5)',
-                  fontWeight: j === 0 ? 300 : 300,
+                  color: j === 0 ? 'rgba(232,213,183,0.9)' : 'rgba(232,213,183,0.78)',
+                  fontWeight: 400,
                   maxWidth: '46ch',
                 }}
               >
@@ -249,7 +249,7 @@ function FounderPanel({
 function TeamMemberCard({ member, index }: { member: TeamMember; index: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.7, delay: index * 0.08, ease }}
@@ -259,7 +259,7 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
         <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
           <Image
             src={member.photo_url}
-            alt={member.name}
+            alt=""
             fill
             style={{ objectFit: 'cover', objectPosition: 'center top', opacity: 0.82 }}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -281,12 +281,12 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
         </h3>
         <p
           style={{
-            fontSize: '10px',
+            fontSize: '12px',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
             color: '#D4A853',
             marginBottom: '1rem',
-            fontWeight: 600,
+            fontWeight: 700,
           }}
         >
           {member.role}
@@ -296,8 +296,8 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
             style={{
               fontSize: '14px',
               lineHeight: 1.8,
-              color: 'rgba(232,213,183,0.5)',
-              fontWeight: 300,
+              color: 'rgba(232,213,183,0.78)',
+              fontWeight: 400,
             }}
           >
             {member.bio}
@@ -331,19 +331,19 @@ export default function AboutPage({ locale, teamMembers }: AboutPageProps) {
       {/* Page header */}
       <div style={{ paddingTop: 'clamp(7rem, 16svh, 10rem)' }} dir="ltr">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease }}
           style={{ padding: '0 clamp(1.5rem, 8vw, 6rem) clamp(3rem, 6vw, 5rem)' }}
         >
           <p
             style={{
-              fontSize: '10px',
+              fontSize: '13px',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
               color: '#D4A853',
               marginBottom: '1.25rem',
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
             UpsideDown Retreat
@@ -374,11 +374,11 @@ export default function AboutPage({ locale, teamMembers }: AboutPageProps) {
         >
           <span
             style={{
-              fontSize: '9px',
+              fontSize: '12px',
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
-              color: 'rgba(232,213,183,0.3)',
-              fontWeight: 600,
+              color: 'rgba(232,213,183,0.78)',
+              fontWeight: 700,
             }}
           >
             {t.foundersLabel}
@@ -408,7 +408,7 @@ export default function AboutPage({ locale, teamMembers }: AboutPageProps) {
       {teamMembers.length > 0 && (
         <section style={{ padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 8vw, 6rem)' }}>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease }}
@@ -416,16 +416,16 @@ export default function AboutPage({ locale, teamMembers }: AboutPageProps) {
             dir="ltr"
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(232,213,183,0.3)', fontWeight: 600 }}>
+              <span style={{ fontSize: '12px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(232,213,183,0.78)', fontWeight: 700 }}>
                 {t.teamLabel}
               </span>
               <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.05)' }} />
             </div>
             <p
               style={{
-                fontSize: 'clamp(14px, 1.5vw, 17px)',
-                color: 'rgba(232,213,183,0.45)',
-                fontWeight: 300,
+                fontSize: 'clamp(15px, 1.5vw, 17px)',
+                color: 'rgba(232,213,183,0.85)',
+                fontWeight: 400,
                 maxWidth: '48ch',
                 lineHeight: 1.75,
               }}

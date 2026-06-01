@@ -1,6 +1,7 @@
 export type Testimonial = {
   name: string
   quote: string
+  quoteHE?: string
 }
 
 export type Instructor = {
@@ -25,19 +26,58 @@ export type RetreatInfo = {
 export const testimonials: Testimonial[] = [
   {
     name: 'Sheli',
-    quote: 'A shift in perspective, a meditative state of being, and a true blessing',
-  },
-  {
-    name: 'Doron',
-    quote: 'Freediving and handstands — two things I love, brought together in the best way',
-  },
-  {
-    name: 'Ayana',
-    quote: 'A heartfelt space for connection, presence, and joy',
+    quote: 'Deep in every sense — meaningful, joyful, meditative. A shift in perspective and a true blessing.',
+    quoteHE: 'עמוק בכל מובן — משמעותי, כיפי ומדיטטיבי. שינוי פרספקטיבה וברכה אמיתית.',
   },
   {
     name: 'Roni',
-    quote: 'I came to dedicate time for myself — and I truly did',
+    quote: 'I came to dedicate time for myself — and I truly achieved that goal. Both handstands and freediving demand relaxation, listening, and quiet. I felt I understood this a little better in both.',
+    quoteHE: 'הגעתי להקדיש זמן לעצמי — והרגשתי שלגמרי הגשמתי את המטרה. שניהם דורשים רגיעה, הקשבה ושקט, ובשניהם הצלחתי להבין את זה קצת יותר.',
+  },
+  {
+    name: 'Gali',
+    quote: 'This was my second retreat with you — the first was excellent, and I worried this one couldn\'t match it. You managed to surpass it.',
+    quoteHE: 'זה הריטריט השני שלי איתכם — הראשון היה מעולה, וחששתי שזה לא יהיה באותה רמה. הצלחתם להתעלות.',
+  },
+  {
+    name: 'Gili',
+    quote: 'Wonderful atmosphere, rare people, professional training, insanely delicious food. I didn\'t expect such a complete and rewarding experience.',
+    quoteHE: 'אווירה נפלאה ואנשים נדירים, אימונים מקצועיים, אוכל טעים בטירוף. לא ציפיתי לחוויה כל כך שלמה ומתגמלת.',
+  },
+  {
+    name: 'Doron',
+    quote: 'An incredible, embracing atmosphere — professional workshops, great food, and exactly the right place.',
+    quoteHE: 'אווירה מדהימה ומכילה, מקצועיות בסדנאות, אוכל טוב ולינה שהייתה בדיוק המקום הנכון.',
+  },
+  {
+    name: 'Anat',
+    quote: 'Super professional and yet with a pleasant, family-like calm. I felt it was exactly what I needed.',
+    quoteHE: 'סופר מקצועי ועם זאת אווירה נעימה ומשפחתית ורגועה. הרגשתי שזה היה כל כך נחוץ.',
+  },
+  {
+    name: 'Maya',
+    quote: 'I loved the colors inside the water, the kind people who gave their hearts, and the toolbox I took home. I couldn\'t have imagined a better experience.',
+    quoteHE: 'אהבתי את הצבעים בתוך המים, את האנשים החמודים שנתנו את ליבם, ואת ארגז הכלים שלקחתי הביתה.',
+  },
+  {
+    name: 'Dana',
+    quote: 'From the moment we arrived, I could disconnect. Quiet, calm, peaceful — and from there everything kept getting better. Professional and warm in equal measure.',
+    quoteHE: 'כשהגענו כבר הרגשתי שיכולתי להתנתק. שקט, שלווה, נעים — ומשם הכל רק המשיך להיות יותר טוב.',
+  },
+  {
+    name: 'Anya',
+    quote: 'The combination of handstands and freediving is perfect. The team is excellent — instructors, additional guides, and the whole amazing family.',
+    quoteHE: 'השילוב בין עמידות ידיים לצלילה מושלם. הצוות מעולה — המדריכים, המדריכים הנוספים, וכמובן המשפחה המדהימה.',
+  },
+  {
+    name: 'Natali',
+    quote: 'Open guidance without pressure or ego — a healthy mirror for physical and mental growth. You created an authentic space in the heart of the desert.',
+    quoteHE: 'הנחיה פתוחה, בלי לחץ או אגו — מראה בריאה לצמיחה גופנית ומנטלית. יצרתם מרחב אותנטי בלב המדבר.',
+  },
+  {
+    name: 'Yuval',
+    quote: 'Spot on. The guidance was very professional, everything was simple, precise, and perfectly suited to the weekend.',
+    quoteHE: 'היה בול. ההדרכות מאד מקצועיות, כל המסביב פשוט ומדויק ומאד הלם את התכנים של הסופש.',
   },
 ]
 

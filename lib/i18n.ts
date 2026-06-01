@@ -6,6 +6,9 @@ export const i18n = {
     nav: {
       logo: 'UpsideDown',
       book: 'Book Now',
+      concept: 'Concept',
+      experience: 'Experience',
+      about: 'About',
       events: 'Events',
     },
     hero: {
@@ -47,15 +50,16 @@ export const i18n = {
     },
     timeline: {
       label: 'The Schedule',
-      title: 'What happens\nduring the retreat?',
+      title: 'What a day\nlooks like',
       body: 'A day designed to deepen — not rush. Every session connects to the next.',
       items: [
-        { time: 'Early Morning', icon: '○', title: 'Handstand Practice', desc: 'Strength, technique, and balance. A slow, focused session with real progression and lots of play.' },
-        { time: 'Mid Morning', icon: '◇', title: 'Breath & Mobility', desc: 'Connecting breath to movement. Preparing the body and nervous system for what\'s ahead.' },
-        { time: 'Midday', icon: '◯', title: 'Freediving in Open Water', desc: 'Into clear water. Guided, safe, and profoundly quiet. No rush. No performance.' },
-        { time: 'Afternoon', icon: '△', title: 'Shared Meals', desc: 'Long tables, real food, real conversations. The meals are part of the retreat.' },
-        { time: 'Late Afternoon', icon: '□', title: 'Rest & Integration', desc: 'Unscheduled time. The body absorbs what it learned. Walk, swim, lie in the sun.' },
-        { time: 'Evening', icon: '◎', title: 'Connection & Talks', desc: 'Small group conversations, reflections, or just quiet togetherness. No program.' },
+        { time: 'Morning', icon: '○', title: 'Breakfast', desc: 'The day starts around a shared table. Good food before the sea.' },
+        { time: 'Morning', icon: '◇', title: 'Freediving Theory & Breathwork', desc: 'Theory, breathing exercises, and preparation for open water. Mind and body ready for depth — then into the sea.' },
+        { time: 'Midday', icon: '◎', title: 'Lunch', desc: 'For all the hungry ones coming back from the water. Real food, slow table, good conversation.' },
+        { time: 'Midday', icon: '□', title: 'Rest', desc: 'Unstructured time. Digest, talk, read, write, nap. No program. The body knows what it needs.' },
+        { time: 'Afternoon', icon: '△', title: 'Handstand Practice', desc: 'Strength, technique, and balance. Focused progressions, a lot of play, and personal feedback.' },
+        { time: 'Evening', icon: '◯', title: 'Dinner', desc: 'Another proper meal, cooked with care. The kind you actually remember.' },
+        { time: 'Night', icon: '◎', title: 'Free Time', desc: 'No agenda. Time to connect, sit by the sea, or just be. Whatever feels right.' },
       ] as { time: string; icon: string; title: string; desc: string }[],
     },
     why: {
@@ -77,21 +81,21 @@ export const i18n = {
     },
     who: {
       label: "Who It's For",
-      title: 'Made for\ncurious bodies',
+      title: 'Who is this\nfor?',
       cards: [
         { title: 'Movement Lovers', desc: 'Anyone who already has a practice — yoga, climbing, dance — and wants to add new depth to it.' },
-        { title: 'Curious Beginners', desc: "You don't need to already stand on your hands. You need to want to try. That's enough." },
+        { title: 'Handstand Base', desc: 'You need to hold a wall handstand for at least 20 seconds. Beyond that — bring curiosity and willingness to push. We take you from there.' },
         { title: 'Challenge Seekers', desc: 'People who want real challenge, without competitiveness or ego. The bar is yours to set.' },
         { title: 'Presence Seekers', desc: 'Those looking for a real experience — not Instagram content. Something to carry home.' },
       ] as { title: string; desc: string }[],
-      reassurance: 'No advanced level required. Both handstands and freediving are taught progressively — from wherever you are. Everything adapts to you.',
+      reassurance: 'Handstands: we ask that you can hold a wall handstand for at least 20 seconds — enough to build on. Freediving starts from zero. Everyone gets individual guidance adapted to their exact level.',
     },
     testimonials: {
       sectionLabel: 'Participants',
       heading: 'What They Say',
     },
     retreat: {
-      sectionLabel: 'Upcoming Retreat',
+      sectionLabel: 'Retreats',
       investment: 'Investment',
       spotsLabel: 'spots remaining',
       filledTemplate: (filled: number, total: number) => `${filled} of ${total} places filled`,
@@ -114,13 +118,14 @@ export const i18n = {
         bio: 'Gil knows what it means to go below the surface — literally and metaphorically. A national record holder and certified instructor, he creates a space where depth feels safe. His teaching is calm, methodical, and deeply human.',
         tags: ['Freediving', 'Breath Work', 'Safety', 'Depth'] as string[],
       },
+      readMore: 'Read the full story',
       bridge: 'Together, we bring two complementary worlds:\none above water, one below.\nOne built on precision and control,\nthe other on letting go and going deeper.',
     },
     faq: {
       label: 'Questions',
       title: 'Answers worth\nreading',
       items: [
-        { q: 'Do I need to know how to do a handstand to join?', a: "No. You need curiosity and a willingness to work. We teach from the very beginning — wall handstands, shoulder conditioning, balance progressions. If you can already hold a freestanding handstand, we'll take you further." },
+        { q: 'Do I need to know how to do a handstand to join?', a: "Yes — one baseline: hold a wall handstand for at least 20 seconds. This ensures enough shoulder and core strength to benefit from the sessions. If you're more advanced, we'll take you further. Everyone gets individual guidance from exactly where they are." },
         { q: 'Do I need freediving experience?', a: "No experience required. We work with complete beginners through pool breathing and shallow water dives. If you're already a diver, we'll work with your existing skills and take you deeper — technically and experientially." },
         { q: "What's the physical fitness requirement?", a: "You should be generally healthy and active. No specific fitness level needed. The retreat is progressive — each session builds on the last. We've had participants from competitive athletes to people recovering from injuries." },
         { q: 'What does the price include?', a: "All sessions (handstands, freediving, breath work), accommodation, 3 meals per day, equipment use, and small group instruction. Travel is not included." },
@@ -143,9 +148,9 @@ export const i18n = {
     },
     finalCta: {
       label: 'Be Part of It',
-      title: 'Ready to turn your\nworld upside down?',
-      sub: 'A few spots remain for 2025. Don\'t wait.',
-      btn1: 'View Retreats',
+      title: 'Ready to dive into\na different experience?',
+      sub: '',
+      btn1: 'Upcoming Events',
     },
     footer: {
       copyright: '© 2025 UpsideDown Retreat. All rights reserved.',
@@ -170,6 +175,10 @@ export const i18n = {
       location: 'Location',
       gallery: 'Gallery',
       aboutRetreat: 'About This Retreat',
+      venueSection: 'The Venue',
+      whoForSection: 'Who is it for',
+      scheduleSection: 'A day in the retreat',
+      instructorsSection: 'Your guides',
     },
     about: {
       pageTitle: 'About',
@@ -179,7 +188,7 @@ export const i18n = {
       noTeam: '',
       yuval: {
         name: 'Yuval Oz',
-        role: 'Handstand teacher, movement artist & performer',
+        role: 'Handstand teacher · Stage artist · Musician',
         bio: `Yuval teaches handstands through an approach that combines technique, exploration, creativity, and enjoyment of the process.\n\nWith years of experience teaching and performing, he works with practitioners of all levels — from complete beginners to advanced students — focusing on awareness, control, breathing, and efficient movement rather than simply "holding a handstand."\n\nComing from a background in acrobatics, physical theater, and performance, Yuval brings a playful, dynamic, and artistic perspective into his teaching. During the retreat, he will guide handstand sessions, technical drills, and movement exploration practices designed to help participants develop greater balance, freedom, and confidence in their bodies.`,
       },
       gil: {
@@ -195,6 +204,9 @@ export const i18n = {
     nav: {
       logo: 'UpsideDown',
       book: 'הזמן מקום',
+      concept: 'הרעיון',
+      experience: 'החוויה',
+      about: 'אודות',
       events: 'אירועים',
     },
     hero: {
@@ -211,7 +223,7 @@ export const i18n = {
     },
     concept: {
       label: 'הרעיון',
-      title: 'להפוך את עולמך\nראש בתחת',
+      title: 'פרספקטיבה הפוכה.\nחיבור עמוק.',
       body: 'ריטריט ייחודי שמשלב דיוק, נשימה, משחק וטבע. לא בריחה מהחיים — אלא חוויה אחרת שלהם.',
       quote: 'דיסציפלינה אחת דורשת שליטה מוחלטת. השנייה מבקשת שתרפה לחלוטין. ביחד, הן יוצרות משהו נדיר.',
       pillars: [
@@ -236,15 +248,16 @@ export const i18n = {
     },
     timeline: {
       label: 'לוח הזמנים',
-      title: 'מה קורה\nבמהלך הריטריט?',
+      title: 'איך נראה\nיום בריטריט?',
       body: 'יום שמיועד להעמקה — לא לרוץ. כל סשן מתחבר לבא אחריו.',
       items: [
-        { time: 'בוקר מוקדם', icon: '○', title: 'אימון עמידת ידיים', desc: 'כוח, טכניקה ושיווי משקל. סשן ממוקד ואיטי עם התקדמות אמיתית והרבה משחק.' },
-        { time: 'אמצע הבוקר', icon: '◇', title: 'נשימה וניידות', desc: 'חיבור נשימה לתנועה. הכנת הגוף והמערכת העצבית למה שעומד לפניה.' },
-        { time: 'צהריים', icon: '◯', title: 'צלילה חופשית במים פתוחים', desc: 'אל תוך מים צלולים. מודרך, בטוח ושקט עמוקות. ללא מהירות. ללא ביצועים.' },
-        { time: 'אחר הצהריים', icon: '△', title: 'ארוחות משותפות', desc: 'שולחנות ארוכים, אוכל אמיתי, שיחות אמיתיות. הארוחות הן חלק מהריטריט.' },
-        { time: 'סוף אחר הצהריים', icon: '□', title: 'מנוחה ושילוב', desc: 'זמן לא מתוכנן. הגוף קולט מה שלמד. ללכת, לשחות, לשכב בשמש.' },
-        { time: 'ערב', icon: '◎', title: 'חיבור ושיחות', desc: 'שיחות קבוצה קטנה, השתקפויות, או פשוט שקט משותף. ללא תכנית.' },
+        { time: 'בוקר', icon: '○', title: 'ארוחת בוקר', desc: 'היום מתחיל סביב שולחן משותף. אוכל טוב לפני הים.' },
+        { time: 'בוקר', icon: '◇', title: 'תיאוריה וצלילה / תרגילי נשימה', desc: 'תיאוריה של צלילה חופשית, תרגילי נשימה והכנה לצלילה — ואז אל הים.' },
+        { time: 'צהריים', icon: '◎', title: 'ארוחת צהריים', desc: 'לכל הרעבים שחוזרים מהים :) אוכל טעים, שולחן איטי, שיחה טובה.' },
+        { time: 'צהריים', icon: '□', title: 'מנוחה', desc: 'זמן לא מובנה. לעכל, לדבר, לקרוא, לכתוב, לנוח. הגוף יודע מה הוא צריך.' },
+        { time: 'אחר הצהריים', icon: '△', title: 'עמידות ידיים', desc: 'כוח, טכניקה ושיווי משקל. התקדמות ממוקדת, הרבה משחק, ומשוב אישי.' },
+        { time: 'ערב', icon: '◯', title: 'ארוחת ערב', desc: 'עוד ארוחה טובה, מבושלת בקפידה. זו שזוכרים.' },
+        { time: 'לילה', icon: '◎', title: 'זמן חופשי', desc: 'ללא תכנית. זמן להתחבר, לשבת ליד הים, או פשוט להיות. מה שמרגיש נכון.' },
       ] as { time: string; icon: string; title: string; desc: string }[],
     },
     why: {
@@ -265,22 +278,22 @@ export const i18n = {
       ] as { num: string; label: string }[],
     },
     who: {
-      label: 'למי זה מיועד',
-      title: 'עבור\nגופות סקרניות',
+      label: 'למי זה מתאים',
+      title: 'למי\nזה מתאים?',
       cards: [
         { title: 'אוהבי תנועה', desc: 'כל מי שכבר יש לו פרקטיקה — יוגה, טיפוס, ריקוד — ורוצה להוסיף לה עומק חדש.' },
-        { title: 'מתחילים סקרנים', desc: 'לא צריך לעמוד על הידיים. צריך לרצות לנסות. זה מספיק.' },
+        { title: 'בסיס עמידת ידיים', desc: 'צריך יכולת לעמוד על הידיים מול קיר לפחות 20 שניות. מעבר לכך — סקרנות ורצון לעבוד. אנחנו לוקחים אותך משם.' },
         { title: 'מחפשי אתגר', desc: 'אנשים שרוצים אתגר אמיתי, ללא תחרותיות או אגו. הרף שלך לקבוע.' },
         { title: 'מחפשי נוכחות', desc: 'אלה שמחפשים חוויה אמיתית — לא תוכן לאינסטגרם. משהו לקחת הביתה.' },
       ] as { title: string; desc: string }[],
-      reassurance: 'לא נדרש רמה מתקדמת. גם עמידות ידיים וגם צלילה חופשית מלומדים בהדרגה — מאיפה שאתה. הכל מתאים אליך.',
+      reassurance: 'בעמידות ידיים — מבקשים יכולת לעמוד מול קיר לפחות 20 שניות. זה מספיק כדי להתקדם. בצלילה — לא צריך שום ניסיון. כל אחד מקבל הדרכה אישית בדיוק לרמה שלו.',
     },
     testimonials: {
       sectionLabel: 'משתתפים',
       heading: 'מה אומרים עלינו',
     },
     retreat: {
-      sectionLabel: 'ריטריט קרוב',
+      sectionLabel: 'ריטריטים',
       investment: 'השקעה',
       spotsLabel: 'מקומות נותרים',
       filledTemplate: (filled: number, total: number) => `${filled} מתוך ${total} מקומות מלאים`,
@@ -293,7 +306,7 @@ export const i18n = {
       title: 'מונחים על ידי\nניסיון',
       yuval: {
         name: 'יובל עוז',
-        role: 'מאזן ידיים · מורה תנועה · אמן בידור',
+        role: 'מורה לעמידות ידיים · אומן במה · מוזיקאי',
         bio: 'יובל בילה שנים על הקצה של מה שגוף יכול לאזן. עבודתו חיה בין קרקס, הופעות רחוב והוראת תנועה עמוקה. הוא מביא דיוק ללא נוקשות — ומשחק מבלי לאבד שליטה.',
         tags: ['איזון ידיים', 'אמנויות קרקס', 'תנועה', 'הופעה'] as string[],
       },
@@ -303,13 +316,14 @@ export const i18n = {
         bio: 'גיל יודע מה זה לרדת מתחת לפני השטח — פשוטו כמשמעו ומטאפורית. שיאן לאומי ומדריך מוסמך, הוא יוצר מרחב בו עומק מרגיש בטוח. הוראתו שקטה, מתודית ועמוקות אנושית.',
         tags: ['צלילה חופשית', 'עבודת נשימה', 'בטיחות', 'עומק'] as string[],
       },
+      readMore: 'לסיפור המלא',
       bridge: 'ביחד, אנחנו מביאים שני עולמות משלימים:\nאחד מעל המים, אחד מתחתיהם.\nאחד בנוי על דיוק ושליטה,\nהאחר על שחרור והעמקה.',
     },
     faq: {
       label: 'שאלות',
       title: 'תשובות שכדאי\nלקרוא',
       items: [
-        { q: 'האם אני צריך לדעת לעמוד על הידיים?', a: 'לא. אתה צריך סקרנות ורצון לעבוד. אנחנו מלמדים מההתחלה — עמידות קיר, הכנת כתפיים, התקדמות שיווי משקל. אם אתה כבר יודע לעמוד, ניקח אותך קדימה.' },
+        { q: 'האם צריך ניסיון בעמידות ידיים?', a: 'כן — מבקשים בסיס אחד: יכולת לעמוד על הידיים מול קיר לפחות 20 שניות. זה מבטיח מספיק כוח בכתפיים וגרעין להפיק מהסשנים. מתקדמים ממש מוזמנים — כל אחד מקבל הדרכה מותאמת לרמה שלו.' },
         { q: 'האם אני צריך ניסיון בצלילה חופשית?', a: 'לא נדרש ניסיון. אנחנו עובדים עם מתחילים מוחלטים דרך נשימה בבריכה וצלילות רדודות. אם אתה כבר צולל, נעבוד עם הכישורים הקיימים שלך.' },
         { q: 'מה דרישות הכושר הגופני?', a: 'עליך להיות בריא ופעיל באופן כללי. לא נדרשת רמת כושר ספציפית. הריטריט הוא הדרגתי — כל סשן בונה על הקודם.' },
         { q: 'מה כולל המחיר?', a: 'כל הסשנים (עמידות ידיים, צלילה חופשית, עבודת נשימה), לינה, 3 ארוחות ביום, שימוש בציוד, והוראה בקבוצה קטנה. טיסות אינן כלולות.' },
@@ -332,9 +346,9 @@ export const i18n = {
     },
     finalCta: {
       label: 'היה חלק מזה',
-      title: 'מוכן להפוך\nאת עולמך ראש בתחת?',
-      sub: 'נותרו מספר מקומות לשנת 2025. אל תחכה.',
-      btn1: 'לריטריטים',
+      title: 'מוכנים לצלול\nלחוויה אחרת?',
+      sub: '',
+      btn1: 'אירועים באים',
     },
     footer: {
       copyright: '© 2025 UpsideDown Retreat. כל הזכויות שמורות.',
@@ -359,6 +373,10 @@ export const i18n = {
       location: 'מיקום',
       gallery: 'גלריה',
       aboutRetreat: 'על הריטריט',
+      venueSection: 'המקום',
+      whoForSection: 'למי זה מיועד',
+      scheduleSection: 'יום בריטריט',
+      instructorsSection: 'המדריכים שלכם',
     },
     about: {
       pageTitle: 'About',
@@ -368,7 +386,7 @@ export const i18n = {
       noTeam: '',
       yuval: {
         name: 'Yuval Oz',
-        role: 'Handstand teacher, movement artist & performer',
+        role: 'Handstand teacher · Stage artist · Musician',
         bio: `יובל מלמד עמידות ידיים מתוך גישה שמחברת בין טכניקה, חקירה, יצירתיות והנאה מהדרך.\n\nעם שנים של ניסיון בהוראה, פרפורמנס ועבודה עם תלמידים מכל הרמות — מהצעדים הראשונים ועד עבודה מתקדמת — הוא שם דגש על פיתוח מודעות, שליטה, נשימה ועבודה חכמה עם הגוף, ולא רק על "להחזיק עמידת ידיים".\n\nמעבר לעולם עמידות הידיים, יובל מגיע מרקע של אקרובטיקה, פרפורמנס ותיאטרון פיזי, מה שמביא לתרגולים שלו גישה משחקית, מוזיקלית ודינמית יותר. בריטריט הוא יוביל סשנים של עמידות ידיים, עבודה טכנית וחקירת תנועה — עם מטרה לעזור לכל משתתף למצוא יותר יציבות, חופש וביטחון בגוף שלו.`,
       },
       gil: {
@@ -382,7 +400,7 @@ export const i18n = {
 
 export type I18n = {
   dir: 'ltr' | 'rtl'
-  nav: { logo: string; book: string; events: string }
+  nav: { logo: string; book: string; concept: string; experience: string; about: string; events: string }
   hero: {
     eyebrow: string
     words: [string, string, string]
@@ -440,6 +458,7 @@ export type I18n = {
     title: string
     yuval: { name: string; role: string; bio: string; tags: string[] }
     gil: { name: string; role: string; bio: string; tags: string[] }
+    readMore: string
     bridge: string
   }
   faq: {
@@ -479,5 +498,9 @@ export type I18n = {
     location: string
     gallery: string
     aboutRetreat: string
+    venueSection: string
+    whoForSection: string
+    scheduleSection: string
+    instructorsSection: string
   }
 }

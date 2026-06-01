@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useCallback } from 'react'
 import { testimonials } from '@/lib/constants'
@@ -13,8 +12,8 @@ interface TestimonialsProps {
 
 export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
   const t = tProp ?? i18n[locale].testimonials
-  void t
   const [[index], setSlide] = useState([0, 0])
+  const isHe = locale === 'he'
 
   const paginate = useCallback((dir: 1 | -1) => {
     setSlide(([prev]) => {
@@ -24,50 +23,47 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
   }, [])
 
   const current = testimonials[index]
+  const currentQuote = isHe && current.quoteHE ? current.quoteHE : current.quote
 
   return (
-    <section id="testimonials" className="relative py-32 md:py-48 overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <Image
-          src="/images/testimonials-bg.jpeg"
-          alt=""
-          fill
-          className="object-cover"
-          style={{ objectPosition: 'center 55%' }}
-          sizes="100vw"
-          quality={70}
-          aria-hidden
-        />
-        <div
-          className="absolute inset-0"
+    <section
+      id="testimonials"
+      className="relative py-28 md:py-40 overflow-hidden"
+      style={{ background: '#F7F8F6' }}
+    >
+      <div className="section-container" dir={locale === 'he' ? 'rtl' : 'ltr'}>
+        {/* Section label */}
+        <motion.p
+          initial={{ y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            background: 'linear-gradient(to bottom, #0B1C2C 0%, rgba(11,28,44,0.88) 30%, rgba(11,28,44,0.88) 70%, #0B1C2C 100%)',
+            fontSize: '13px',
+            letterSpacing: '0.28em',
+            textTransform: 'uppercase',
+            color: '#6B5535',
+            marginBottom: '3.5rem',
+            fontWeight: 600,
           }}
-        />
-      </div>
+        >
+          {t.sectionLabel}
+        </motion.p>
 
-      <div className="section-container">
-        <div className="flex items-start gap-8 md:gap-16" dir="ltr">
-          {/* Large index number */}
-          <div className="hidden md:block shrink-0 w-36 pt-1 select-none">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="font-display font-light"
-                style={{
-                  fontSize: 'clamp(6rem, 10vw, 9rem)',
-                  lineHeight: 1,
-                  color: 'rgba(232,213,183,0.06)',
-                  display: 'block',
-                }}
-              >
-                {String(index + 1).padStart(2, '0')}
-              </motion.span>
-            </AnimatePresence>
+        <div className="flex items-start gap-8 md:gap-16">
+          {/* Large quote mark — decorative */}
+          <div className="hidden md:block shrink-0 w-24 pt-1 select-none" aria-hidden="true">
+            <span
+              style={{
+                fontFamily: 'var(--font-cormorant), Georgia, serif',
+                fontSize: 'clamp(7rem, 11vw, 10rem)',
+                lineHeight: 0.8,
+                color: 'rgba(11,29,42,0.4)',
+                display: 'block',
+              }}
+            >
+              &ldquo;
+            </span>
           </div>
 
           {/* Quote + navigation */}
@@ -75,27 +71,34 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
                 <blockquote
-                  className="font-display italic"
                   style={{
-                    fontSize: 'clamp(1.5rem, 3vw, 2.6rem)',
-                    lineHeight: 1.28,
+                    fontFamily: 'var(--font-cormorant), Georgia, serif',
+                    fontStyle: 'italic',
+                    fontSize: 'clamp(1.6rem, 3.2vw, 2.8rem)',
+                    lineHeight: 1.25,
                     letterSpacing: '-0.01em',
-                    color: '#E8D5B7',
-                    marginBottom: '1.75rem',
+                    color: '#0B1D2A',
+                    marginBottom: '2rem',
+                    fontWeight: 400,
                   }}
                 >
-                  {current.quote}
+                  {currentQuote}
                 </blockquote>
 
                 <p
-                  className="eyebrow"
-                  style={{ color: 'rgba(212,168,83,0.6)', fontSize: '0.62rem' }}
+                  style={{
+                    fontSize: '13px',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: '#6B5535',
+                    fontWeight: 700,
+                  }}
                 >
                   — {current.name}
                 </p>
@@ -103,7 +106,7 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center gap-5 mt-14">
+            <div className="flex items-center gap-5 mt-12" dir="ltr">
               {/* Dash selectors */}
               <div className="flex items-center gap-2">
                 {testimonials.map((_, i) => (
@@ -111,14 +114,16 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
                     key={i}
                     onClick={() => setSlide([i, i > index ? 1 : -1])}
                     aria-label={`Go to testimonial ${i + 1}`}
-                    className="py-3 group"
+                    className="py-3"
+                    style={{ cursor: 'pointer' }}
                   >
                     <span
                       className="block transition-all duration-500"
                       style={{
-                        width: i === index ? '2.75rem' : '1.25rem',
-                        height: '1px',
-                        background: i === index ? '#D4A853' : 'rgba(212,168,83,0.2)',
+                        width: i === index ? '2.75rem' : '1rem',
+                        height: '2px',
+                        background: i === index ? '#0B1D2A' : 'rgba(11,29,42,0.18)',
+                        borderRadius: '1px',
                       }}
                     />
                   </button>
@@ -127,11 +132,12 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
 
               {/* Count */}
               <span
-                className="font-body"
                 style={{
-                  fontSize: '0.65rem',
+                  fontSize: '13px',
                   letterSpacing: '0.1em',
-                  color: 'rgba(232,213,183,0.22)',
+                  color: 'rgba(11,29,42,0.7)',
+                  fontWeight: 500,
+                  fontFamily: 'var(--font-manrope), sans-serif',
                 }}
               >
                 {String(index + 1).padStart(2, '0')} / {String(testimonials.length).padStart(2, '0')}
@@ -140,17 +146,23 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
               {/* Prev / Next */}
               <div className="ml-auto flex items-center gap-1">
                 <button
-                  onClick={() => paginate(-1)}
+                  onClick={() => paginate(isHe ? 1 : -1)}
                   aria-label="Previous"
-                  className="flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300"
-                  style={{ border: '1px solid rgba(212,168,83,0.2)', color: 'rgba(212,168,83,0.45)' }}
+                  className="flex items-center justify-center w-9 h-9"
+                  style={{
+                    border: '1px solid #0B1D2A',
+                    borderRadius: '50%',
+                    color: '#0B1D2A',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(212,168,83,0.6)'
-                    e.currentTarget.style.color = '#D4A853'
+                    e.currentTarget.style.borderColor = 'rgba(11,29,42,0.5)'
+                    e.currentTarget.style.color = '#0B1D2A'
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = 'rgba(212,168,83,0.2)'
-                    e.currentTarget.style.color = 'rgba(212,168,83,0.45)'
+                    e.currentTarget.style.borderColor = '#0B1D2A'
+                    e.currentTarget.style.color = '#0B1D2A'
                   }}
                 >
                   <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
@@ -158,17 +170,23 @@ export default function Testimonials({ locale, t: tProp }: TestimonialsProps) {
                   </svg>
                 </button>
                 <button
-                  onClick={() => paginate(1)}
+                  onClick={() => paginate(isHe ? -1 : 1)}
                   aria-label="Next"
-                  className="flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300"
-                  style={{ border: '1px solid rgba(212,168,83,0.2)', color: 'rgba(212,168,83,0.45)' }}
+                  className="flex items-center justify-center w-9 h-9"
+                  style={{
+                    border: '1px solid #0B1D2A',
+                    borderRadius: '50%',
+                    color: '#0B1D2A',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(212,168,83,0.6)'
-                    e.currentTarget.style.color = '#D4A853'
+                    e.currentTarget.style.borderColor = 'rgba(11,29,42,0.5)'
+                    e.currentTarget.style.color = '#0B1D2A'
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = 'rgba(212,168,83,0.2)'
-                    e.currentTarget.style.color = 'rgba(212,168,83,0.45)'
+                    e.currentTarget.style.borderColor = '#0B1D2A'
+                    e.currentTarget.style.color = '#0B1D2A'
                   }}
                 >
                   <svg width="11" height="11" viewBox="0 0 11 11" fill="none">

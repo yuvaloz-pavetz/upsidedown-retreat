@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import AdminShell from '@/components/admin/AdminShell'
 import type { RetreatRow } from '@/lib/supabase/types'
 
@@ -19,10 +20,29 @@ export default async function RetreatsListPage() {
     .order('sort_order', { ascending: true })
     .order('year', { ascending: false })
 
+  // Count paid/partially_paid leads per event slug (for early bird spot tracking)
+  const paidCountsBySlug: Record<string, number> = {}
+  try {
+    const admin = createAdminClient()
+    const { data: leadCounts } = await admin
+      .from('leads')
+      .select('event_slug')
+      .in('status', ['partially_paid', 'paid'])
+    if (leadCounts) {
+      for (const l of leadCounts) {
+        paidCountsBySlug[l.event_slug] = (paidCountsBySlug[l.event_slug] ?? 0) + 1
+      }
+    }
+  } catch {
+    // leads table may not exist — skip silently
+  }
+
+  const rows = (retreats as RetreatRow[]) ?? []
+
   return (
     <AdminShell>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.4rem', fontWeight: 400, color: '#e2e8f0', margin: 0 }}>Retreats</h1>
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 400, color: '#e2e8f0', margin: 0 }}>Events</h1>
         <Link
           href="/admin/retreats/new"
           style={{
@@ -41,7 +61,7 @@ export default async function RetreatsListPage() {
         </Link>
       </div>
 
-      {!retreats || retreats.length === 0 ? (
+      {rows.length === 0 ? (
         <p style={{ color: 'rgba(226,232,240,0.4)', fontSize: '0.9rem' }}>
           No retreats yet. Create your first one.
         </p>
@@ -49,7 +69,7 @@ export default async function RetreatsListPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-              {['Name', 'Location', 'Dates', 'Spots', 'Status', ''].map(h => (
+              {['Name', 'Dates', 'Spots', 'Status', 'Early Bird', ''].map(h => (
                 <th key={h} style={{
                   textAlign: 'left',
                   padding: '0.6rem 1rem',
@@ -65,49 +85,78 @@ export default async function RetreatsListPage() {
             </tr>
           </thead>
           <tbody>
-            {(retreats as RetreatRow[]).map((r) => (
-              <tr
-                key={r.id}
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
-              >
-                <td style={{ padding: '1rem', color: '#e2e8f0' }}>
-                  <div style={{ fontWeight: 500 }}>{r.title_en}</div>
-                  <div style={{ color: 'rgba(226,232,240,0.35)', fontSize: '0.78rem', marginTop: '2px' }}>{r.slug}</div>
-                </td>
-                <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)' }}>{r.location_en}</td>
-                <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)' }}>{r.dates_en}</td>
-                <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)' }}>
-                  {r.spots_remaining} / {r.spots_total}
-                </td>
-                <td style={{ padding: '1rem' }}>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '99px',
-                    fontSize: '0.7rem',
-                    letterSpacing: '0.06em',
-                    background: `${STATUS_COLORS[r.status]}18`,
-                    color: STATUS_COLORS[r.status],
-                    border: `1px solid ${STATUS_COLORS[r.status]}40`,
-                  }}>
-                    {r.status}
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', textAlign: 'right' }}>
-                  <Link
-                    href={`/admin/retreats/${r.id}/edit`}
-                    style={{
-                      color: 'rgba(212,168,83,0.7)',
-                      fontSize: '0.78rem',
-                      textDecoration: 'none',
-                      letterSpacing: '0.04em',
-                    }}
-                  >
-                    Edit
-                  </Link>
-                </td>
-              </tr>
-            ))}
+            {rows.map((r) => {
+              const paidCount = paidCountsBySlug[r.slug] ?? 0
+              const ebSpots = r.early_bird_spots ?? 0
+              const deadlinePassed = r.early_bird_deadline ? new Date(r.early_bird_deadline) < new Date() : false
+              const ebActive = !!r.early_bird_enabled && paidCount < ebSpots && !deadlinePassed
+              const ebExhausted = !!r.early_bird_enabled && (paidCount >= ebSpots || deadlinePassed)
+
+              return (
+                <tr key={r.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '1rem', color: '#e2e8f0' }}>
+                    <div style={{ fontWeight: 500 }}>{r.title_en}</div>
+                    <div style={{ color: 'rgba(226,232,240,0.35)', fontSize: '0.78rem', marginTop: '2px' }}>{r.slug}</div>
+                  </td>
+                  <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)', fontSize: '0.82rem' }}>{r.dates_en}</td>
+                  <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)' }}>
+                    {r.spots_remaining} / {r.spots_total}
+                  </td>
+                  <td style={{ padding: '1rem' }}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '99px',
+                      fontSize: '0.7rem',
+                      letterSpacing: '0.06em',
+                      background: `${STATUS_COLORS[r.status]}18`,
+                      color: STATUS_COLORS[r.status],
+                      border: `1px solid ${STATUS_COLORS[r.status]}40`,
+                    }}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem' }}>
+                    {!r.early_bird_enabled ? (
+                      <span style={{ color: 'rgba(226,232,240,0.18)', fontSize: '0.72rem' }}>—</span>
+                    ) : ebActive ? (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                        padding: '0.25rem 0.65rem', borderRadius: '99px', fontSize: '0.68rem',
+                        background: 'rgba(212,168,83,0.12)', color: '#D4A853',
+                        border: '1px solid rgba(212,168,83,0.35)',
+                        fontWeight: 600, letterSpacing: '0.05em',
+                      }}>
+                        ✦ Early Bird
+                        <span style={{ fontWeight: 400, opacity: 0.7 }}>{paidCount}/{ebSpots}</span>
+                      </span>
+                    ) : (
+                      <span style={{
+                        display: 'inline-block', padding: '0.25rem 0.65rem', borderRadius: '99px',
+                        fontSize: '0.68rem', background: 'rgba(255,255,255,0.04)',
+                        color: 'rgba(226,232,240,0.3)', border: '1px solid rgba(255,255,255,0.07)',
+                        letterSpacing: '0.04em',
+                      }}>
+                        {deadlinePassed ? 'EB Expired' : `EB Full ${paidCount}/${ebSpots}`}
+                      </span>
+                    )}
+                  </td>
+                  <td style={{ padding: '1rem', textAlign: 'right' }}>
+                    <Link
+                      href={`/admin/retreats/${r.id}/edit`}
+                      style={{
+                        color: 'rgba(212,168,83,0.7)',
+                        fontSize: '0.78rem',
+                        textDecoration: 'none',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      Edit
+                    </Link>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       )}

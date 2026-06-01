@@ -16,7 +16,8 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
       id="experience"
       className="relative overflow-hidden"
       style={{
-        background: [
+        backgroundColor: '#070d18',
+        backgroundImage: [
           'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(14,32,56,0.6) 0%, transparent 60%)',
           'linear-gradient(to bottom, #070d18 0%, #0a1826 50%, #070d18 100%)',
         ].join(', '),
@@ -25,14 +26,14 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
       <div className="section-container py-28 md:py-40">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16 md:mb-20"
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
         >
-          <p className="eyebrow mb-5" style={{ fontSize: '0.6rem' }}>{t.label}</p>
+          <p className="eyebrow mb-5">{t.label}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-end">
             <h2
               className="font-display font-light italic"
@@ -49,9 +50,9 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
               className="font-body"
               style={{
                 fontSize: '1rem',
-                color: 'rgba(232,213,183,0.5)',
+                color: 'rgba(232,213,183,0.9)',
                 lineHeight: 1.75,
-                fontWeight: 300,
+                fontWeight: 400,
                 maxWidth: '40ch',
               }}
             >
@@ -61,13 +62,13 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
         </motion.div>
 
         {/* Timeline */}
-        <div dir="ltr" style={{ position: 'relative' }}>
+        <div dir={locale === 'he' ? 'rtl' : 'ltr'} style={{ position: 'relative' }}>
           {/* Vertical line */}
           <div
             aria-hidden
             style={{
               position: 'absolute',
-              left: '24px',
+              insetInlineStart: '24px',
               top: 0,
               bottom: 0,
               width: '1px',
@@ -78,7 +79,7 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
           {t.items.map((item, i) => (
             <motion.div
               key={item.title}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
@@ -96,14 +97,14 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
                     width: '48px',
                     height: '48px',
                     borderRadius: '50%',
-                    background: 'rgba(212,168,83,0.08)',
-                    border: '1px solid rgba(212,168,83,0.3)',
+                    background: 'rgba(212,168,83,0.12)',
+                    border: '1px solid rgba(212,168,83,0.65)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    fontSize: '1.1rem',
-                    color: 'rgba(212,168,83,0.7)',
+                    fontSize: '1.3rem',
+                    color: '#D4A853',
                     zIndex: 1,
                   }}
                 >
@@ -127,11 +128,12 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
                 <p
                   className="font-body"
                   style={{
-                    fontSize: '0.65rem',
+                    fontSize: '0.8rem',
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     color: '#D4A853',
                     marginBottom: '0.5rem',
+                    fontWeight: 600,
                   }}
                 >
                   {item.time}
@@ -151,9 +153,9 @@ export default function Timeline({ locale, t: tProp }: TimelineProps) {
                   className="font-body"
                   style={{
                     fontSize: '0.92rem',
-                    color: 'rgba(232,213,183,0.45)',
+                    color: 'rgba(232,213,183,0.9)',
                     lineHeight: 1.7,
-                    fontWeight: 300,
+                    fontWeight: 400,
                     maxWidth: '52ch',
                   }}
                 >

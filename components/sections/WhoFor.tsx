@@ -1,22 +1,45 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { i18n, type Locale } from '@/lib/i18n'
 
-const ICONS = ['◎', '○', '◇', '△']
+const ICONS: ReactNode[] = [
+  // Movement Lovers — wave / flow
+  <svg key="wave" width="32" height="24" viewBox="0 0 32 24" fill="none" aria-hidden="true">
+    <path d="M2 17c3 0 3-6 6-6s3 6 6 6 3-6 6-6 3 6 6 6" stroke="#C8A97A" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M8 10c1.5 0 2-3 4-3s2.5 3 4 3" stroke="#C8A97A" strokeWidth="1.5" strokeLinecap="round" strokeOpacity={0.4}/>
+  </svg>,
+  // Curious Beginners — compass
+  <svg key="compass" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+    <circle cx="14" cy="14" r="11" stroke="#C8A97A" strokeWidth="1.5"/>
+    <path d="M14 8v3M14 17v3M8 14h3M17 14h3" stroke="#C8A97A" strokeWidth="1.5" strokeLinecap="round" strokeOpacity={0.45}/>
+    <circle cx="14" cy="14" r="2.5" stroke="#C8A97A" strokeWidth="1.5"/>
+  </svg>,
+  // Challenge Seekers — mountain
+  <svg key="mountain" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+    <path d="M14 5L26 23H2L14 5Z" stroke="#C8A97A" strokeWidth="1.5" strokeLinejoin="round"/>
+    <path d="M10 17l4-7 4 7" stroke="#C8A97A" strokeWidth="1.5" strokeLinejoin="round" strokeOpacity={0.4}/>
+  </svg>,
+  // Presence Seekers — eye
+  <svg key="eye" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+    <path d="M3 14s4-9 11-9 11 9 11 9-4 9-11 9S3 14 3 14Z" stroke="#C8A97A" strokeWidth="1.5" strokeLinejoin="round"/>
+    <circle cx="14" cy="14" r="3.5" stroke="#C8A97A" strokeWidth="1.5"/>
+    <circle cx="14" cy="14" r="1.5" fill="#C8A97A"/>
+  </svg>,
+]
 
 interface WhoForProps {
   locale: Locale
   t?: typeof i18n['en']['who']
 }
 
-function AudienceCard({ card, icon, index }: { card: { title: string; desc: string }; icon: string; index: number }) {
+function AudienceCard({ card, icon, index }: { card: { title: string; desc: string }; icon: ReactNode; index: number }) {
   const [hovered, setHovered] = useState(false)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -33,16 +56,9 @@ function AudienceCard({ card, icon, index }: { card: { title: string; desc: stri
         cursor: 'default',
       }}
     >
-      <span
-        style={{
-          display: 'block',
-          fontSize: '1.75rem',
-          color: '#C8A97A',
-          marginBottom: '1.25rem',
-        }}
-      >
+      <div style={{ marginBottom: '1.25rem', lineHeight: 0 }}>
         {icon}
-      </span>
+      </div>
       <h3
         style={{
           fontFamily: 'var(--font-cormorant), Georgia, serif',
@@ -57,9 +73,9 @@ function AudienceCard({ card, icon, index }: { card: { title: string; desc: stri
       <p
         style={{
           fontSize: '14px',
-          color: '#6B7884',
+          color: '#4A5764',
           lineHeight: 1.65,
-          fontWeight: 300,
+          fontWeight: 400,
         }}
       >
         {card.desc}
@@ -79,22 +95,22 @@ export default function WhoFor({ locale, t: tProp }: WhoForProps) {
       <div className="section-container">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16"
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
         >
           <p
             style={{
               fontFamily: 'var(--font-manrope), sans-serif',
-              fontSize: '11px',
+              fontSize: '13px',
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
-              color: '#E3B23C',
+              color: '#6B4D14',
               marginBottom: '24px',
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             {t.label}
@@ -115,7 +131,7 @@ export default function WhoFor({ locale, t: tProp }: WhoForProps) {
         </motion.div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-14" dir="ltr">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-14" dir={locale === 'he' ? 'rtl' : 'ltr'}>
           {t.cards.map((card, i) => (
             <AudienceCard key={card.title} card={card} icon={ICONS[i]} index={i} />
           ))}
@@ -123,11 +139,11 @@ export default function WhoFor({ locale, t: tProp }: WhoForProps) {
 
         {/* Reassurance bar */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -138,13 +154,16 @@ export default function WhoFor({ locale, t: tProp }: WhoForProps) {
             border: '1px solid rgba(200,169,122,0.35)',
           }}
         >
-          <span style={{ fontSize: '2rem', color: '#C8A97A', flexShrink: 0 }}>◎</span>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <circle cx="14" cy="14" r="11" stroke="#C8A97A" strokeWidth="1.5"/>
+            <circle cx="14" cy="14" r="4" stroke="#C8A97A" strokeWidth="1.5"/>
+          </svg>
           <p
             style={{
               fontSize: '17px',
               color: '#0B1D2A',
               lineHeight: 1.65,
-              fontWeight: 300,
+              fontWeight: 400,
             }}
           >
             {t.reassurance}

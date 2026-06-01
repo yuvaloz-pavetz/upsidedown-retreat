@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { i18n, type Locale } from '@/lib/i18n'
@@ -24,7 +25,7 @@ function InstructorCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.8, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
@@ -50,7 +51,7 @@ function InstructorCard({
       >
         <Image
           src={image}
-          alt={data.name}
+          alt=""
           fill
           className="object-cover"
           style={{ objectPosition: 'center top' }}
@@ -73,7 +74,7 @@ function InstructorCard({
       <p
         className="font-body"
         style={{
-          fontSize: '0.7rem',
+          fontSize: '0.8rem',
           color: '#D4A853',
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
@@ -88,32 +89,13 @@ function InstructorCard({
         className="font-body"
         style={{
           fontSize: '0.95rem',
-          color: 'rgba(232,213,183,0.5)',
+          color: 'rgba(232,213,183,0.9)',
           lineHeight: 1.75,
-          fontWeight: 300,
-          marginBottom: '1.75rem',
+          fontWeight: 400,
         }}
       >
-        {data.bio}
+        {data.bio.split('. ')[0] + '.'}
       </p>
-
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        {data.tags.map((tag) => (
-          <span
-            key={tag}
-            style={{
-              padding: '0.35rem 0.875rem',
-              border: '1px solid rgba(212,168,83,0.2)',
-              borderRadius: '20px',
-              fontSize: '0.65rem',
-              color: 'rgba(212,168,83,0.7)',
-              letterSpacing: '0.06em',
-            }}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
     </motion.div>
   )
 }
@@ -131,7 +113,8 @@ export default function Instructors({ locale, t: tProp }: InstructorsProps) {
       id="instructors"
       className="relative overflow-hidden"
       style={{
-        background: [
+        backgroundColor: '#07101c',
+        backgroundImage: [
           'radial-gradient(ellipse 80% 55% at 25% 35%, rgba(16,38,64,0.55) 0%, transparent 60%)',
           'linear-gradient(to bottom, #07101c, #0a1826, #07101c)',
         ].join(', '),
@@ -140,14 +123,14 @@ export default function Instructors({ locale, t: tProp }: InstructorsProps) {
       <div className="section-container py-28 md:py-40">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16 md:mb-20"
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
         >
-          <p className="eyebrow mb-5" style={{ fontSize: '0.6rem' }}>{t.label}</p>
+          <p className="eyebrow mb-5">{t.label}</p>
           <h2
             className="font-display font-light italic"
             style={{
@@ -165,20 +148,20 @@ export default function Instructors({ locale, t: tProp }: InstructorsProps) {
         <div
           className="grid grid-cols-1 lg:grid-cols-2"
           style={{ gap: '2px' }}
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
         >
           {people.map(({ data, image }, i) => (
             <InstructorCard key={data.name} data={data} image={image} index={i} />
           ))}
         </div>
 
-        {/* Bridge quote */}
+        {/* Bridge quote + About CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
           style={{
             background: 'rgba(212,168,83,0.04)',
             padding: 'clamp(2.5rem, 5vw, 3.75rem) clamp(2rem, 4vw, 3.25rem)',
@@ -193,12 +176,42 @@ export default function Instructors({ locale, t: tProp }: InstructorsProps) {
               color: 'rgba(232,213,183,0.75)',
               lineHeight: 1.8,
               maxWidth: '680px',
-              margin: '0 auto',
+              margin: '0 auto 2.5rem',
               whiteSpace: 'pre-line',
             }}
           >
             {t.bridge}
           </p>
+          <Link
+            href={`/${locale}/about`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.85rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#D4A853',
+              fontWeight: 600,
+              textDecoration: 'none',
+              borderBottom: '1px solid rgba(212,168,83,0.6)',
+              paddingBottom: '2px',
+              transition: 'color 0.3s, border-color 0.3s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLAnchorElement).style.color = '#E8C87A'
+              ;(e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(212,168,83,0.7)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLAnchorElement).style.color = '#D4A853'
+              ;(e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(212,168,83,0.3)'
+            }}
+          >
+            {t.readMore}
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
         </motion.div>
       </div>
     </section>

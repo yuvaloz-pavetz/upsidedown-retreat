@@ -12,10 +12,10 @@ interface NavProps {
 }
 
 const linkStyle = {
-  color: 'rgba(255,255,255,0.75)',
+  color: 'rgba(255,255,255,0.92)',
   textDecoration: 'none',
   fontSize: '13px',
-  fontWeight: 400,
+  fontWeight: 500,
   letterSpacing: '0.08em',
   textTransform: 'uppercase' as const,
   transition: 'color 0.3s',
@@ -32,10 +32,10 @@ export default function Nav({ locale }: NavProps) {
   })
 
   const anchorLinks = [
-    { href: `/${locale}#concept`,    label: 'Concept'    },
-    { href: `/${locale}#experience`, label: 'Experience' },
-    { href: `/${locale}/about`,       label: 'About', isPage: true },
-    { href: `/${locale}/events`,     label: 'Events', isPage: true },
+    { href: `/${locale}#concept`,    label: t.concept    },
+    { href: `/${locale}#experience`, label: t.experience },
+    { href: `/${locale}/about`,       label: t.about, isPage: true },
+    { href: `/${locale}/events`,     label: t.events, isPage: true },
   ]
 
   return (
@@ -78,7 +78,8 @@ export default function Nav({ locale }: NavProps) {
           </Link>
 
           {/* Center anchor links — desktop only */}
-          <ul className="hidden lg:flex items-center" style={{ listStyle: 'none', gap: '36px' }}>
+          <nav aria-label={locale === 'he' ? 'ניווט ראשי' : 'Main navigation'} className="hidden lg:flex">
+          <ul className="flex items-center" style={{ listStyle: 'none', gap: '36px' }}>
             {anchorLinks.map(link => (
               <li key={link.href}>
                 {link.isPage
@@ -86,18 +87,19 @@ export default function Nav({ locale }: NavProps) {
                       href={link.href}
                       style={linkStyle}
                       onMouseEnter={e => (e.currentTarget.style.color = '#E6D7C0')}
-                      onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.92)')}
                     >{link.label}</Link>
                   : <a
                       href={link.href}
                       style={linkStyle}
                       onMouseEnter={e => (e.currentTarget.style.color = '#E6D7C0')}
-                      onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.92)')}
                     >{link.label}</a>
                 }
               </li>
             ))}
           </ul>
+          </nav>
 
           {/* Right: Language (desktop) | Hamburger (mobile) */}
           <div className="flex items-center gap-3">
@@ -110,6 +112,7 @@ export default function Nav({ locale }: NavProps) {
               className="flex lg:hidden"
               onClick={() => setMenuOpen(prev => !prev)}
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
               style={{
                 position: 'relative',
                 width: '40px',
@@ -154,6 +157,7 @@ export default function Nav({ locale }: NavProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
+            id="mobile-nav-drawer"
             className="fixed inset-0 z-40 lg:hidden"
             style={{ background: 'oklch(12% 0.02 220 / 0.97)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
             dir="ltr"
@@ -167,11 +171,11 @@ export default function Nav({ locale }: NavProps) {
               style={{ height: '100%', padding: '100px 2.25rem 2.5rem' }}
             >
               {/* Nav links */}
-              <nav className="flex flex-col" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <nav aria-label={locale === 'he' ? 'ניווט ראשי' : 'Main navigation'} className="flex flex-col" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 {anchorLinks.map((link, i) => (
                   <motion.div
                     key={link.href}
-                    initial={{ opacity: 0, x: -12 }}
+                    initial={{ x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.06 + i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   >
@@ -184,7 +188,7 @@ export default function Nav({ locale }: NavProps) {
                             fontFamily: 'var(--font-cormorant), Georgia, serif',
                             fontSize: 'clamp(2.25rem, 10vw, 3rem)',
                             fontWeight: 400,
-                            color: 'rgba(246,240,231,0.82)',
+                            color: 'rgba(246,240,231,0.95)',
                             textDecoration: 'none',
                             letterSpacing: '-0.01em',
                             lineHeight: 1.1,
@@ -200,7 +204,7 @@ export default function Nav({ locale }: NavProps) {
                             fontFamily: 'var(--font-cormorant), Georgia, serif',
                             fontSize: 'clamp(2.25rem, 10vw, 3rem)',
                             fontWeight: 400,
-                            color: 'rgba(246,240,231,0.82)',
+                            color: 'rgba(246,240,231,0.95)',
                             textDecoration: 'none',
                             letterSpacing: '-0.01em',
                             lineHeight: 1.1,

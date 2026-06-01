@@ -46,10 +46,29 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    if (user && pathname === '/admin/login') {
-      const url = request.nextUrl.clone()
-      url.pathname = '/admin/retreats'
-      return NextResponse.redirect(url)
+    if (user) {
+      // Check admin role. Falls back to allowing access if profiles table not yet migrated.
+      let isAdmin = true
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+        if (profile) isAdmin = profile.role === 'admin'
+      } catch { /* profiles table may not exist yet — allow through */ }
+
+      if (pathname === '/admin/login') {
+        const url = request.nextUrl.clone()
+        url.pathname = isAdmin ? '/admin/retreats' : '/'
+        return NextResponse.redirect(url)
+      }
+
+      if (!isAdmin) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/'
+        return NextResponse.redirect(url)
+      }
     }
 
     return response

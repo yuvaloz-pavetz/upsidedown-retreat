@@ -35,22 +35,18 @@ export default function LanguageSwitcher({ currentLocale }: LanguageSwitcherProp
           <motion.button
             key={loc}
             onClick={() => switchLocale(loc)}
+            aria-label={loc === 'en' ? 'Switch to English' : 'עבור לעברית'}
+            aria-current={active ? 'true' : undefined}
             className="relative rounded-full px-2.5 py-1 font-body text-xs font-medium transition-colors duration-300"
             style={{
               letterSpacing: '0.06em',
-              color: active ? '#0B1C2C' : 'rgba(232,213,183,0.5)',
-              fontSize: '0.68rem',
+              color: active ? '#0B1C2C' : 'rgba(232,213,183,0.85)',
+              backgroundColor: active ? '#D4A853' : 'transparent',
+              fontSize: '13px',
+              fontWeight: active ? 700 : 600,
             }}
             whileTap={{ scale: 0.95 }}
           >
-            {active && (
-              <motion.div
-                layoutId="lang-pill"
-                className="absolute inset-0 rounded-full"
-                style={{ background: '#D4A853' }}
-                transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-              />
-            )}
             <span className="relative z-10">{loc.toUpperCase()}</span>
           </motion.button>
         )

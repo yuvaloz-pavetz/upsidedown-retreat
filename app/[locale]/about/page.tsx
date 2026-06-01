@@ -47,10 +47,10 @@ export default async function About({
   }
 
   return (
-    <>
+    <main id="main-content">
       <Nav locale={loc} />
       <AboutPage locale={loc} teamMembers={teamMembers} />
       <Footer locale={loc} />
-    </>
+    </main>
   )
 }

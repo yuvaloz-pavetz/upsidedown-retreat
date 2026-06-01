@@ -7,18 +7,16 @@ import { i18n, type Locale } from '@/lib/i18n'
 
 const panelVariants = {
   left: {
-    hidden: { x: '-7%', opacity: 0 },
+    hidden: { x: '-7%' },
     visible: {
       x: 0,
-      opacity: 1,
       transition: { duration: 1.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
     },
   },
   right: {
-    hidden: { x: '7%', opacity: 0 },
+    hidden: { x: '7%' },
     visible: {
       x: 0,
-      opacity: 1,
       transition: { duration: 1.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
     },
   },
@@ -71,7 +69,7 @@ function Panel({
           >
             <Image
               src={hoverImageSrc}
-              alt="alternate view"
+              alt=""
               fill
               className="object-cover"
               style={{ transform: 'rotate(180deg)', objectPosition: 'center' }}
@@ -93,7 +91,7 @@ function Panel({
         </h2>
         <p
           className="font-body text-base leading-relaxed"
-          style={{ color: 'rgba(232,213,183,0.85)', fontWeight: 300, maxWidth: '38ch' }}
+          style={{ color: 'rgba(232,213,183,0.92)', fontWeight: 400, maxWidth: '38ch' }}
         >
           {body}
         </p>
@@ -113,7 +111,7 @@ export default function Experience({ locale, t: tProp }: ExperienceProps) {
   const lineInView = useInView(lineRef, { once: true, margin: '-100px' })
 
   return (
-    <section id="experience" className="relative" style={{ minHeight: '100svh' }}>
+    <section id="experience" className="relative" style={{ minHeight: '100svh', backgroundColor: '#0B1D2A' }}>
 
 <div className="grid grid-cols-1 lg:grid-cols-2" style={{ minHeight: '100svh' }}>
         <Panel
@@ -122,7 +120,7 @@ export default function Experience({ locale, t: tProp }: ExperienceProps) {
           heading={t.above.heading}
           body={t.above.body}
           imageSrc="/images/above-surface.jpg"
-          imageAlt="Handstand practice at the retreat"
+          imageAlt=""
           hoverImageSrc="/images/above-surface-2.jpg"
           overlay="linear-gradient(135deg, rgba(11,28,44,0.82) 0%, rgba(11,28,44,0.6) 60%, rgba(11,28,44,0.45) 100%)"
         />
@@ -160,7 +158,7 @@ export default function Experience({ locale, t: tProp }: ExperienceProps) {
           heading={t.below.heading}
           body={t.below.body}
           imageSrc="/images/below-surface.jpeg"
-          imageAlt="Freedivers descending into blue water"
+          imageAlt=""
           overlay="linear-gradient(135deg, rgba(11,28,44,0.45) 0%, rgba(11,28,44,0.65) 50%, rgba(11,28,44,0.85) 100%)"
         />
       </div>

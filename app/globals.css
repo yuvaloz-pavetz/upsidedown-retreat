@@ -55,7 +55,7 @@
     --glass-bg-subtle:   rgba(11, 28, 44, 0.40);
     --glass-bg-mid:      rgba(11, 28, 44, 0.65);
     --glass-bg-heavy:    rgba(11, 28, 44, 0.82);
-    --glass-border:      rgba(232, 213, 183, 0.12);
+    --glass-border:      rgba(232, 213, 183, 0.4);
     --glass-border-gold: rgba(212, 168, 83, 0.28);
     --glass-shadow:      0 8px 32px rgba(0, 0, 0, 0.45),
                          0 1px 0 rgba(255, 255, 255, 0.04) inset;
@@ -63,12 +63,12 @@
 
   html {
     scroll-behavior: smooth;
-    background-color: #F7F8F6;
+    background-color: #0B1D2A;
   }
 
   body {
-    background-color: #F7F8F6;
-    color: #0B1D2A;
+    background-color: #0B1D2A;
+    color: #E8D5B7;
     font-family: var(--font-manrope), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -160,20 +160,12 @@
   }
 
   .eyebrow {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     font-family: var(--font-manrope), sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--gold);
-  }
-
-  .text-gold-gradient {
-    background: linear-gradient(135deg, #D4A853 0%, #EDD494 45%, #D4A853 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   .text-display-2xl {
@@ -223,11 +215,11 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.875rem 2.5rem;
-    border: 1px solid rgba(212, 168, 83, 0.45);
+    border: 1px solid rgba(212, 168, 83, 0.75);
     color: #E8D5B7;
     font-family: var(--font-manrope), sans-serif;
-    font-size: 0.7rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
@@ -244,10 +236,11 @@
     display: inline-flex;
     align-items: center;
     padding: 1rem 2.75rem;
-    background: linear-gradient(135deg, #D4A853 0%, #c8962a 100%);
+    background-color: #c8962a;
+    background-image: linear-gradient(135deg, #D4A853 0%, #c8962a 100%);
     color: #0B1C2C;
     font-family: var(--font-manrope), sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -266,4 +259,89 @@
       object-position: 70% 35%;
     }
   }
+
+  /* Focus rings — visible on keyboard navigation (WCAG 2.1 AA / SI 5568) */
+  :focus-visible {
+    outline: 2px solid #D4A853;
+    outline-offset: 2px;
+  }
+
+  /* Placeholders meet 4.5:1 contrast minimum */
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(232, 213, 183, 0.7);
+    opacity: 1;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid rgba(212, 168, 83, 0.6);
+    outline-offset: 1px;
+  }
+
+  .btn-solid-gold:focus-visible {
+    outline: 2px solid rgba(212, 168, 83, 0.8);
+    outline-offset: 3px;
+  }
+
+  .btn-ghost-gold:focus-visible {
+    outline: 2px solid rgba(212, 168, 83, 0.6);
+    outline-offset: 2px;
+  }
+
+  /* Disabled button state */
+  .btn-solid-gold:disabled,
+  .btn-ghost-gold:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes pillarWave1 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes pillarWave2 {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── ACCESSIBILITY WIDGET OVERRIDES ────────────────────────── */
+html.high-contrast {
+  filter: contrast(1.5) brightness(1.05);
+}
+
+html.underline-links a {
+  text-decoration: underline !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── SKIP NAVIGATION ───────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 10000;
+  background: #D4A853;
+  color: #0B1D2A;
+  padding: 0.65rem 1.25rem;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 6px 6px;
+  transition: top 0.2s ease;
+}
+.skip-link:focus-visible {
+  top: 0;
+  outline: 2px solid #0B1D2A;
+  outline-offset: 2px;
 }

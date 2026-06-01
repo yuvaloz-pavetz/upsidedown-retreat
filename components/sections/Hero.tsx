@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
 import { motion, type Easing } from 'framer-motion'
 import { i18n, type Locale } from '@/lib/i18n'
@@ -18,15 +17,16 @@ export default function Hero({ locale, t: tProp }: HeroProps) {
   return (
     <section
       className="relative flex items-center justify-start"
-      style={{ minHeight: '100svh' }}
-      aria-label="UpsideDown Retreat"
+      style={{ minHeight: '100svh', overflowX: 'hidden', backgroundColor: '#0B1D2A' }}
     >
-      {/* Video background — falls back to poster if no video file */}
+      {/* Video background — decorative, no audio */}
       <video
         autoPlay
         muted
         loop
         playsInline
+        aria-hidden="true"
+        tabIndex={-1}
         poster="/images/hero-new.jpeg"
         className="hero-bg"
         style={{
@@ -38,6 +38,7 @@ export default function Hero({ locale, t: tProp }: HeroProps) {
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
+        <track kind="captions" src="/videos/hero-captions.vtt" srcLang="en" label="No audio (decorative video)" default />
       </video>
 
       {/* Overlay: darker top (nav area) + bottom (depth), open center */}
@@ -65,77 +66,71 @@ export default function Hero({ locale, t: tProp }: HeroProps) {
         }}
       />
 
-      {/* Centered content column */}
+      {/* Content column — left aligned */}
       <div
-        className="relative z-10 flex flex-col items-center w-3/4 sm:w-1/2"
-        dir="ltr"
+        className="relative z-10 flex flex-col items-start"
+        dir={locale === 'he' ? 'rtl' : 'ltr'}
         style={{
-          textAlign: 'center',
-          paddingTop: 'clamp(72px, 12vh, 100px)',
-          paddingBottom: 'clamp(48px, 8vh, 64px)',
-          paddingLeft: 'clamp(16px, 4vw, 48px)',
-          paddingRight: 'clamp(16px, 4vw, 48px)',
+          width: '100%',
+          maxWidth: '640px',
+          paddingTop: 'clamp(64px, 12vh, 100px)',
+          paddingBottom: 'clamp(36px, 6vh, 64px)',
+          paddingLeft: 'clamp(20px, 6vw, 80px)',
+          paddingRight: 'clamp(20px, 6vw, 60px)',
         }}
       >
         {/* Icon logo */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.3, delay: 0.3, ease }}
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: 'clamp(6px, 1.5vh, 18px)' }}
         >
           <Image
             src="/images/UpsideDown Retreat - LOGO.png"
-            alt="UpsideDown Retreat"
+            alt=""
             width={400}
             height={400}
             priority
             style={{
               objectFit: 'contain',
+              objectPosition: 'left center',
               filter: 'brightness(0) invert(1) opacity(0.92)',
               display: 'block',
-              width: '100%',
-              maxWidth: '380px',
+              width: 'auto',
+              maxWidth: 'clamp(160px, 38vw, 300px)',
+              maxHeight: 'clamp(80px, 14vh, 180px)',
               height: 'auto',
             }}
           />
         </motion.div>
 
         {/* Tagline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, delay: 0.75, ease }}
+        <h1
           style={{
             fontFamily: 'var(--font-cormorant), Georgia, serif',
-            fontSize: 'clamp(18px, 2.4vw, 32px)',
-            fontWeight: 300,
-            lineHeight: 1.25,
+            fontSize: 'clamp(22px, 5vw, 80px)',
+            fontWeight: 400,
+            lineHeight: 1.1,
             letterSpacing: '0.01em',
             color: '#E6D7C0',
-            marginBottom: '40px',
-            maxWidth: '28ch',
+            marginBottom: 'clamp(20px, 3.5vh, 48px)',
+            maxWidth: '16ch',
           }}
         >
           {t.titleLine1} {t.titleLine2}
           <br />
           <span style={{ color: '#F7F8F6', fontWeight: 400 }}>{t.titleLine3}</span>
-        </motion.h1>
+        </h1>
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.3, ease: 'easeOut' as Easing }}
+        <a
+          href="#retreats"
+          className="btn-solid-gold"
+          style={{ fontSize: '0.8rem' }}
         >
-          <Link
-            href={`/${locale}/events`}
-            className="btn-solid-gold"
-            style={{ fontSize: '0.65rem' }}
-          >
-            {t.cta}
-          </Link>
-        </motion.div>
+          {t.cta}
+        </a>
       </div>
 
     </section>

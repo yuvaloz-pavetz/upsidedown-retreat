@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState } from 'react'
 import { i18n, type Locale } from '@/lib/i18n'
+import LoginModal from '@/components/ui/LoginModal'
 
 interface FooterProps {
   locale: Locale
@@ -10,6 +12,7 @@ interface FooterProps {
 
 export default function Footer({ locale }: FooterProps) {
   const t = i18n[locale].footer
+  const [loginOpen, setLoginOpen] = useState(false)
 
   return (
     <footer style={{ background: '#0f0f1e' }} className="px-6 sm:px-12 lg:px-20 pt-16 pb-10">
@@ -35,7 +38,7 @@ export default function Footer({ locale }: FooterProps) {
           <p
             style={{
               fontSize: '14px',
-              color: 'rgba(255,255,255,0.35)',
+              color: 'rgba(255,255,255,0.75)',
               lineHeight: 1.65,
               maxWidth: '240px',
               marginTop: '14px',
@@ -45,8 +48,8 @@ export default function Footer({ locale }: FooterProps) {
             <br />
             <span
               style={{
-                color: 'rgba(255,255,255,0.2)',
-                fontSize: '11px',
+                color: 'rgba(255,255,255,0.65)',
+                fontSize: '13px',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 display: 'inline-block',
@@ -62,7 +65,7 @@ export default function Footer({ locale }: FooterProps) {
         <div>
           <p
             style={{
-              fontSize: '11px',
+              fontSize: '13px',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               color: '#E6D7C0',
@@ -75,15 +78,15 @@ export default function Footer({ locale }: FooterProps) {
             {[
               { href: `/${locale}#concept`, label: locale === 'he' ? 'הרעיון' : 'Concept' },
               { href: `/${locale}#experience`, label: locale === 'he' ? 'החוויה' : 'Experience' },
-              { href: `/${locale}#founders`, label: locale === 'he' ? 'המדריכים' : 'Founders' },
+              { href: `/${locale}#instructors`, label: locale === 'he' ? 'המדריכים' : 'Instructors' },
               { href: `/${locale}/events`, label: locale === 'he' ? 'ריטריטים' : 'Retreats' },
             ].map(link => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', transition: 'color 0.3s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', transition: 'color 0.3s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#E6D7C0')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
                 >
                   {link.label}
                 </Link>
@@ -96,7 +99,7 @@ export default function Footer({ locale }: FooterProps) {
         <div>
           <p
             style={{
-              fontSize: '11px',
+              fontSize: '13px',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               color: '#E6D7C0',
@@ -107,18 +110,19 @@ export default function Footer({ locale }: FooterProps) {
           </p>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { href: 'https://instagram.com', label: 'Instagram' },
-              { href: '#', label: locale === 'he' ? 'ניוזלטר' : 'Newsletter' },
-              { href: 'mailto:yuvaloz@gmail.com', label: locale === 'he' ? 'צור קשר' : 'Contact' },
+              { href: 'https://www.instagram.com/upsidedown.retreat', label: 'Instagram' },
+              { href: 'https://www.facebook.com/upsidedown.retreat', label: 'Facebook' },
+              { href: `/${locale}#newsletter`, label: locale === 'he' ? 'ניוזלטר' : 'Newsletter' },
+              { href: 'mailto:upsidedownretreat@gmail.com', label: locale === 'he' ? 'צור קשר' : 'Contact' },
             ].map(link => (
               <li key={link.href}>
                 <a
                   href={link.href}
                   target={link.href.startsWith('http') ? '_blank' : undefined}
                   rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', transition: 'color 0.3s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', transition: 'color 0.3s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#E6D7C0')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
                 >
                   {link.label}
                 </a>
@@ -131,7 +135,7 @@ export default function Footer({ locale }: FooterProps) {
         <div>
           <p
             style={{
-              fontSize: '11px',
+              fontSize: '13px',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               color: '#E6D7C0',
@@ -142,19 +146,18 @@ export default function Footer({ locale }: FooterProps) {
           </p>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { href: '#', label: locale === 'he' ? 'מדיניות פרטיות' : 'Privacy Policy' },
-              { href: '#', label: locale === 'he' ? 'תנאי שימוש' : 'Terms' },
-              { href: '#', label: locale === 'he' ? 'ביטול' : 'Cancellation' },
+              { href: `/${locale}/accessibility`, label: locale === 'he' ? 'נגישות' : 'Accessibility' },
+              { href: `/${locale}/privacy`, label: locale === 'he' ? 'מדיניות פרטיות' : 'Privacy Policy' },
             ].map(link => (
-              <li key={link.label}>
-                <a
+              <li key={link.href}>
+                <Link
                   href={link.href}
-                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', transition: 'color 0.3s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+                  style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', transition: 'color 0.3s' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#E6D7C0')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -174,12 +177,23 @@ export default function Footer({ locale }: FooterProps) {
           gap: '12px',
         }}
       >
-        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)' }}>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
           {t.copyright}
         </p>
-        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)' }}>
-          Made with depth.
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
+            Made with depth.
+          </p>
+          <button
+            onClick={() => setLoginOpen(true)}
+            style={{ background: 'none', border: 'none', padding: 0, fontSize: '13px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', letterSpacing: '0.12em', textTransform: 'uppercase', transition: 'color 0.3s', cursor: 'pointer' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#E6D7C0')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
+          >
+            {locale === 'he' ? 'כניסה לאיזור אישי' : 'Personal Area'}
+          </button>
+          <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} locale={locale} />
+        </div>
       </div>
     </footer>
   )

@@ -18,12 +18,12 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
       style={{ background: '#EFE9DD' }}
     >
       <div className="section-container">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24" dir="ltr">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24" dir={locale === 'he' ? 'rtl' : 'ltr'}>
 
           {/* Left: header + numbered list */}
           <div>
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
@@ -32,12 +32,12 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
               <p
                 style={{
                   fontFamily: 'var(--font-manrope), sans-serif',
-                  fontSize: '11px',
+                  fontSize: '13px',
                   letterSpacing: '0.28em',
                   textTransform: 'uppercase',
-                  color: '#E3B23C',
+                  color: '#6B4D14',
                   marginBottom: '24px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 {t.label}
@@ -61,7 +61,7 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
               {t.items.map((item, i) => (
                 <motion.li
                   key={item.heading}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-60px' }}
                   transition={{ duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
@@ -78,11 +78,12 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
                 >
                   <span
                     style={{
-                      fontSize: '11px',
-                      color: '#C8A97A',
+                      fontSize: '14px',
+                      color: '#6B5535',
                       letterSpacing: '0.1em',
                       paddingTop: '4px',
                       flexShrink: 0,
+                      fontWeight: 600,
                     }}
                   >
                     0{i + 1}
@@ -91,7 +92,7 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
                     <h3
                       style={{
                         fontFamily: 'var(--font-cormorant), Georgia, serif',
-                        fontSize: '19px',
+                        fontSize: '22px',
                         color: '#0B1D2A',
                         marginBottom: '6px',
                         fontWeight: 400,
@@ -101,10 +102,10 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
                     </h3>
                     <p
                       style={{
-                        fontSize: '14px',
-                        color: '#6B7884',
+                        fontSize: '17px',
+                        color: '#4A5764',
                         lineHeight: 1.65,
-                        fontWeight: 300,
+                        fontWeight: 400,
                       }}
                     >
                       {item.desc}
@@ -118,7 +119,7 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
           {/* Right: sticky visual + stat grid */}
           <div style={{ position: 'sticky', top: '120px', alignSelf: 'start' }}>
             <motion.div
-              initial={{ opacity: 0, x: 24 }}
+              initial={{ x: 24 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 1.0, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -134,7 +135,7 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
               >
                 <Image
                   src="/images/retreat-session.jpg"
-                  alt="Retreat experience"
+                  alt=""
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 40vw"
@@ -149,7 +150,7 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
                 {t.stats.map((stat, i) => (
                   <motion.div
                     key={stat.label}
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-40px' }}
                     transition={{ duration: 0.7, delay: 0.3 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
@@ -173,9 +174,10 @@ export default function WhyDifferent({ locale, t: tProp }: WhyDifferentProps) {
                     </div>
                     <div
                       style={{
-                        fontSize: '12px',
-                        color: '#6B7884',
+                        fontSize: '13px',
+                        color: '#4A5764',
                         letterSpacing: '0.05em',
+                        fontWeight: 500,
                       }}
                     >
                       {stat.label}

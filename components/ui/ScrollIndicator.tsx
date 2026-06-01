@@ -11,7 +11,7 @@ export default function ScrollIndicator() {
       style={{ opacity }}
       className="flex flex-col items-center gap-2 cursor-default select-none"
     >
-      <span className="eyebrow" style={{ fontSize: '0.6rem', letterSpacing: '0.25em' }}>
+      <span className="eyebrow" style={{ letterSpacing: '0.25em' }}>
         Scroll
       </span>
       <motion.div

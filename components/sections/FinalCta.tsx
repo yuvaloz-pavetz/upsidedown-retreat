@@ -55,28 +55,21 @@ export default function FinalCta({ locale, t: tProp }: FinalCtaProps) {
       ))}
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+        <p
           style={{
             fontFamily: 'var(--font-manrope), sans-serif',
-            fontSize: '11px',
+            fontSize: '13px',
             letterSpacing: '0.25em',
             textTransform: 'uppercase',
             color: '#E6D7C0',
             marginBottom: '24px',
+            fontWeight: 500,
           }}
         >
           {t.label}
-        </motion.p>
+        </p>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.0, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        <h2
           style={{
             fontFamily: 'var(--font-cormorant), Georgia, serif',
             fontSize: 'clamp(36px, 5vw, 64px)',
@@ -94,25 +87,21 @@ export default function FinalCta({ locale, t: tProp }: FinalCtaProps) {
               <em style={{ fontStyle: 'italic', color: '#E6D7C0' }}>{titleLines[1]}</em>
             </>
           )}
-        </motion.h2>
+        </h2>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.25 }}
+        <p
           style={{
             fontSize: '17px',
-            color: 'rgba(255,255,255,0.45)',
+            color: 'rgba(255,255,255,0.92)',
             marginBottom: '52px',
-            fontWeight: 300,
+            fontWeight: 400,
           }}
         >
           {t.sub}
-        </motion.p>
+        </p>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.35 }}
@@ -121,7 +110,7 @@ export default function FinalCta({ locale, t: tProp }: FinalCtaProps) {
           <Link
             href={`/${locale}/events`}
             className="btn-solid-gold"
-            style={{ fontSize: '0.65rem' }}
+            style={{ fontSize: '0.8rem' }}
           >
             {t.btn1}
           </Link>

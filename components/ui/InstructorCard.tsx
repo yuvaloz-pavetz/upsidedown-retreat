@@ -12,7 +12,7 @@ interface InstructorCardProps {
 export default function InstructorCard({ instructor, delay = 0 }: InstructorCardProps) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ delay, duration: 1.0, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -34,7 +34,7 @@ export default function InstructorCard({ instructor, delay = 0 }: InstructorCard
         >
           <Image
             src={instructor.image}
-            alt={instructor.name}
+            alt=""
             fill
             className="object-cover"
             style={{ objectPosition: 'center top' }}
@@ -66,7 +66,7 @@ export default function InstructorCard({ instructor, delay = 0 }: InstructorCard
           >
             {instructor.name}
           </h3>
-          <p className="eyebrow mt-1" style={{ fontSize: '0.62rem' }}>
+          <p className="eyebrow mt-1">
             {instructor.role}
           </p>
         </motion.div>
@@ -75,7 +75,7 @@ export default function InstructorCard({ instructor, delay = 0 }: InstructorCard
       {/* Bio */}
       <p
         className="font-body text-sm leading-relaxed"
-        style={{ color: 'rgba(232,213,183,0.6)', fontWeight: 300, maxWidth: '38ch' }}
+        style={{ color: 'rgba(232,213,183,0.85)', fontWeight: 400, maxWidth: '38ch' }}
       >
         {instructor.bio}
       </p>

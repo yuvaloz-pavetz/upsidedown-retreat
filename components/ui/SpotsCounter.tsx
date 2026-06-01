@@ -42,13 +42,13 @@ export default function SpotsCounter({
         <span
           ref={displayRef}
           className="font-display text-4xl"
-          style={{ color: isUrgent ? '#B5521A' : '#D4A853', fontStyle: 'italic' }}
+          style={{ color: isUrgent ? '#FF8C5A' : '#D4A853', fontStyle: 'italic' }}
         >
           0
         </span>
         <span
           className="font-body text-sm"
-          style={{ color: 'rgba(232,213,183,0.6)', letterSpacing: '0.05em' }}
+          style={{ color: 'rgba(232,213,183,0.85)', letterSpacing: '0.05em' }}
         >
           {spotsLabel}
         </span>
@@ -69,7 +69,7 @@ export default function SpotsCounter({
       </div>
 
       {filledLabel && (
-        <p className="font-body text-xs" style={{ color: 'rgba(232,213,183,0.45)', letterSpacing: '0.05em' }}>
+        <p className="font-body text-xs" style={{ color: 'rgba(232,213,183,0.78)', letterSpacing: '0.05em' }}>
           {filledLabel}
         </p>
       )}

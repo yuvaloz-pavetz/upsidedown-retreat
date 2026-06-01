@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { i18n, type Locale } from '@/lib/i18n'
 import type { Event } from '@/lib/events'
+import { getEventPricing } from '@/lib/events'
 
 interface UpcomingRetreatProps {
   locale: Locale
@@ -16,7 +17,7 @@ interface UpcomingRetreatProps {
 function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; index: number }) {
   const [hovered, setHovered] = useState(false)
   const t = i18n[locale].events
-  const pricing = locale === 'he' ? event.pricingILS : event.pricingEUR
+  const { price: pricingVal } = getEventPricing(event, locale)
 
   const statusLabel =
     event.status === 'open' ? (locale === 'he' ? 'פתוח להרשמה' : 'Open') :
@@ -36,7 +37,7 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.8, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }}
@@ -56,7 +57,7 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
       <div style={{ height: '220px', position: 'relative', overflow: 'hidden' }}>
         <Image
           src={event.heroImage}
-          alt={event.location[locale]}
+          alt=""
           fill
           className="object-cover"
           style={{
@@ -73,45 +74,46 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
             left: '20px',
             background: statusBg,
             color: statusColor,
-            fontSize: '10px',
+            fontSize: '12px',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             padding: '5px 12px',
             borderRadius: '20px',
-            fontWeight: 500,
+            fontWeight: 600,
           }}
         >
           {statusLabel}
         </span>
-        {/* Spots badge */}
-        {event.spotsRemaining > 0 && event.status !== 'coming-soon' && (
-          <span
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              background: 'rgba(26,26,46,0.8)',
-              color: '#F7F8F6',
-              fontSize: '11px',
-              padding: '5px 12px',
-              borderRadius: '20px',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            {event.spotsRemaining} {t.spotsLeft}
+        {/* Early Bird badge */}
+        {event.earlyBirdActive && (
+          <span style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(212,168,83,0.92)',
+            color: '#0B1D2A',
+            fontSize: '11px',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            padding: '5px 11px',
+            borderRadius: '20px',
+            fontWeight: 700,
+          }}>
+            ✦ {locale === 'he' ? 'ציפור מוקדמת' : 'Early Bird'}
           </span>
         )}
       </div>
 
       {/* Body */}
-      <div style={{ padding: '32px' }}>
+      <div style={{ padding: '32px' }} dir={locale === 'he' ? 'rtl' : 'ltr'}>
         <p
           style={{
-            fontSize: '11px',
+            fontSize: '13px',
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            color: '#C8A97A',
+            color: '#6B5535',
             marginBottom: '10px',
+            fontWeight: 600,
           }}
         >
           {event.location[locale]}
@@ -130,7 +132,7 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
         <p
           style={{
             fontSize: '14px',
-            color: '#6B7884',
+            color: '#4A5764',
             marginBottom: '12px',
           }}
         >
@@ -139,7 +141,7 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
         <p
           style={{
             fontSize: '14px',
-            color: '#6B7884',
+            color: '#4A5764',
             lineHeight: 1.6,
             marginBottom: '28px',
             fontStyle: 'italic',
@@ -149,6 +151,9 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
+            <p style={{ fontSize: '12px', letterSpacing: '0.09em', textTransform: 'uppercase', color: 'rgba(11,29,42,0.78)', marginBottom: '2px', fontWeight: 600 }}>
+              {locale === 'he' ? 'החל מ' : 'Starting from'}
+            </p>
             <span
               style={{
                 fontFamily: 'var(--font-cormorant), Georgia, serif',
@@ -157,14 +162,11 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
                 fontWeight: 400,
               }}
             >
-              {pricing}
-            </span>
-            <span style={{ fontSize: '12px', color: '#6B7884', marginLeft: '4px' }}>
-              / person
+              {pricingVal}
             </span>
           </div>
           <Link
-            href={`/${locale}/events`}
+            href={`/${locale}/events/${event.slug}`}
             style={{
               background: '#0B1D2A',
               color: '#F7F8F6',
@@ -197,23 +199,23 @@ export default function UpcomingRetreat({ locale, events, t: tProp }: UpcomingRe
       <div className="section-container">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-16"
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
         >
           <div>
             <p
               style={{
                 fontFamily: 'var(--font-manrope), sans-serif',
-                fontSize: '11px',
+                fontSize: '13px',
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
-                color: '#E3B23C',
+                color: '#6B4D14',
                 marginBottom: '24px',
-                fontWeight: 500,
+                fontWeight: 600,
               }}
             >
               {t.sectionLabel}
@@ -228,14 +230,14 @@ export default function UpcomingRetreat({ locale, events, t: tProp }: UpcomingRe
                 letterSpacing: '-0.01em',
               }}
             >
-              {locale === 'he' ? 'תאריכי ריטריט' : 'Retreat dates'}
+              {locale === 'he' ? 'אירועים באים' : 'Upcoming events'}
             </h2>
           </div>
           <Link
             href={`/${locale}/events`}
-            style={{ color: '#C8A97A', textDecoration: 'none', fontSize: '14px', letterSpacing: '0.05em' }}
+            style={{ color: '#6B5535', textDecoration: 'underline', fontSize: '14px', letterSpacing: '0.05em', fontWeight: 600 }}
           >
-            {locale === 'he' ? 'לכל הריטריטים →' : 'View all retreats →'}
+            {locale === 'he' ? 'לכל הריטריטים →' : 'All upcoming events →'}
           </Link>
         </motion.div>
 
@@ -251,7 +253,7 @@ export default function UpcomingRetreat({ locale, events, t: tProp }: UpcomingRe
           </div>
         ) : (
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -275,15 +277,15 @@ export default function UpcomingRetreat({ locale, events, t: tProp }: UpcomingRe
             >
               {locale === 'he' ? 'תאריכים בקרוב' : 'Dates coming soon'}
             </p>
-            <p style={{ fontSize: '15px', color: '#6B7884', marginBottom: '32px' }}>
+            <p style={{ fontSize: '15px', color: '#4A5764', marginBottom: '32px' }}>
               {locale === 'he'
                 ? 'הירשמו לעדכון על תאריכי הריטריט הבאים'
                 : 'Register your interest to be notified when dates are announced'}
             </p>
             <a
-              href={`mailto:yuvaloz@gmail.com?subject=${encodeURIComponent('Retreat interest')}`}
+              href={`mailto:upsidedownretreat@gmail.com?subject=${encodeURIComponent('Retreat interest')}`}
               className="btn-solid-gold"
-              style={{ fontSize: '0.65rem' }}
+              style={{ fontSize: '0.8rem' }}
             >
               {locale === 'he' ? 'שלחו לי עדכון' : 'Notify me'}
             </a>

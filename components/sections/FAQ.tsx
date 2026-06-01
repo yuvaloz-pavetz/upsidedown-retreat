@@ -17,7 +17,7 @@ function FAQItem({ item, index, isOpen, onToggle }: {
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.6, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
@@ -44,14 +44,14 @@ function FAQItem({ item, index, isOpen, onToggle }: {
           style={{
             width: '28px',
             height: '28px',
-            border: `1px solid ${isOpen ? 'rgba(200,169,122,0.7)' : 'rgba(200,169,122,0.4)'}`,
+            border: `1px solid ${isOpen ? 'rgba(139,115,73,0.9)' : 'rgba(139,115,73,0.7)'}`,
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
             fontSize: '16px',
-            color: isOpen ? '#0B1D2A' : '#C8A97A',
+            color: isOpen ? '#0B1D2A' : '#6B5535',
             background: isOpen ? '#C8A97A' : 'transparent',
             transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
             transition: 'all 0.35s ease',
@@ -74,9 +74,9 @@ function FAQItem({ item, index, isOpen, onToggle }: {
             <p
               style={{
                 fontSize: '16px',
-                color: '#6B7884',
+                color: '#4A5764',
                 lineHeight: 1.75,
-                fontWeight: 300,
+                fontWeight: 400,
                 paddingBottom: '28px',
                 maxWidth: '68ch',
               }}
@@ -104,22 +104,22 @@ export default function FAQ({ locale, t: tProp }: FAQProps) {
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             className="mb-16"
-            dir="ltr"
+            dir={locale === 'he' ? 'rtl' : 'ltr'}
           >
             <p
               style={{
                 fontFamily: 'var(--font-manrope), sans-serif',
-                fontSize: '11px',
+                fontSize: '13px',
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
-                color: '#E3B23C',
+                color: '#6B4D14',
                 marginBottom: '24px',
-                fontWeight: 500,
+                fontWeight: 600,
               }}
             >
               {t.label}
@@ -140,7 +140,7 @@ export default function FAQ({ locale, t: tProp }: FAQProps) {
           </motion.div>
 
           {/* Accordion */}
-          <div dir="ltr" style={{ borderTop: '1px solid rgba(26,26,46,0.1)' }}>
+          <div dir={locale === 'he' ? 'rtl' : 'ltr'} style={{ borderTop: '1px solid rgba(26,26,46,0.1)' }}>
             {t.items.map((item, i) => (
               <FAQItem
                 key={i}

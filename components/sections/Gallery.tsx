@@ -27,7 +27,7 @@ function GalleryItem({ src, alt, col, h, index }: { src: string; alt: string; co
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 1.04 }}
+      initial={{ scale: 1.04 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 1.0, delay: (index % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -44,7 +44,7 @@ function GalleryItem({ src, alt, col, h, index }: { src: string; alt: string; co
     >
       <Image
         src={src}
-        alt={alt}
+        alt=""
         fill
         className="object-cover"
         sizes={`${Math.round(col / 12 * 100)}vw`}
@@ -53,29 +53,6 @@ function GalleryItem({ src, alt, col, h, index }: { src: string; alt: string; co
           transition: 'transform 0.7s cubic-bezier(0.16,1,0.3,1)',
         }}
       />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(26,26,46,0.6)',
-          opacity: hovered ? 1 : 0,
-          transition: 'opacity 0.4s',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <span
-          style={{
-            fontSize: '12px',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: '#F7F8F6',
-          }}
-        >
-          {alt}
-        </span>
-      </div>
     </motion.div>
   )
 }
@@ -95,22 +72,22 @@ export default function Gallery({ locale, t: tProp }: GalleryProps) {
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="mb-16"
-          dir="ltr"
+          dir={locale === 'he' ? 'rtl' : 'ltr'}
         >
           <p
             style={{
               fontFamily: 'var(--font-manrope), sans-serif',
-              fontSize: '11px',
+              fontSize: '13px',
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
               color: '#E6D7C0',
               marginBottom: '24px',
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             {t.label}

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import type { Locale, I18n } from '@/lib/i18n'
 import type { Event } from '@/lib/events'
+import { getEventPricing, getEarlyBirdPricing } from '@/lib/events'
 
 interface EventsPageContentProps {
   locale: Locale
@@ -24,14 +25,34 @@ function StatusBadge({ status, t }: { status: Event['status']; t: I18n['events']
     <span
       className="eyebrow px-3 py-1 rounded-full"
       style={{
-        fontSize: '0.6rem',
-        background: status === 'sold-out' ? 'rgba(181,82,26,0.2)' : 'rgba(74,155,184,0.2)',
-        border: `1px solid ${status === 'sold-out' ? 'rgba(181,82,26,0.4)' : 'rgba(74,155,184,0.4)'}`,
-        color: status === 'sold-out' ? '#B5521A' : '#4A9BB8',
+        background: status === 'sold-out' ? 'rgba(255,140,90,0.18)' : 'rgba(110,190,220,0.18)',
+        border: `1px solid ${status === 'sold-out' ? 'rgba(255,140,90,0.7)' : 'rgba(110,190,220,0.7)'}`,
+        color: status === 'sold-out' ? '#FF8C5A' : '#6EBEDC',
       }}
     >
       {label}
     </span>
+  )
+}
+
+function EarlyBirdCornerBadge({ locale }: { locale: Locale }) {
+  return (
+    <div className="absolute top-6 left-6 z-20 pointer-events-none">
+      <div
+        className="eyebrow px-3 py-1.5 rounded-sm"
+        style={{
+          background: 'rgba(212,168,83,0.15)',
+          border: '1px solid rgba(212,168,83,0.65)',
+          color: '#E8C87A',
+          backdropFilter: 'blur(8px)',
+          letterSpacing: '0.1em',
+          fontWeight: 700,
+          fontSize: '0.6rem',
+        }}
+      >
+        ✦ {locale === 'he' ? 'מחיר ציפור מוקדמת' : 'Early Bird'}
+      </div>
+    </div>
   )
 }
 
@@ -44,13 +65,13 @@ function LastSpotsBadge({ label }: { label: string }) {
       <div
         className="eyebrow px-3 py-1.5 rounded-sm"
         style={{
-          fontSize: '0.58rem',
-          background: 'rgba(212,168,83,0.18)',
-          border: '1px solid rgba(212,168,83,0.55)',
-          color: '#D4A853',
+          background: 'rgba(212,168,83,0.2)',
+          border: '1px solid rgba(212,168,83,0.8)',
+          color: '#E8C87A',
           boxShadow: '0 0 16px rgba(212,168,83,0.2)',
           backdropFilter: 'blur(8px)',
           letterSpacing: '0.12em',
+          fontWeight: 700,
         }}
       >
         {label}
@@ -61,11 +82,26 @@ function LastSpotsBadge({ label }: { label: string }) {
 
 export default function EventsPageContent({ locale, events, t }: EventsPageContentProps) {
   return (
-    <>
+    <div style={{ background: '#0B1D2A', minHeight: '100vh' }}>
+      {/* Fixed nav gradient — keeps nav readable over any hero image */}
+      <div
+        aria-hidden
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '140px',
+          background: 'linear-gradient(to bottom, rgba(5,11,20,0.92) 0%, transparent 100%)',
+          zIndex: 40,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Hero */}
       <section
         className="relative flex items-end overflow-hidden"
-        style={{ minHeight: '45vh', paddingTop: '8rem', paddingBottom: '4rem' }}
+        style={{ minHeight: '60vh', paddingTop: '10rem', paddingBottom: '5rem' }}
       >
         <div className="absolute inset-0 -z-10">
           <Image
@@ -82,13 +118,13 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(to bottom, rgba(11,28,44,0.5) 0%, rgba(11,28,44,0.75) 60%, #0B1C2C 100%)',
+                'linear-gradient(to bottom, rgba(5,11,20,0.88) 0%, rgba(11,28,44,0.6) 50%, #0B1C2C 100%)',
             }}
           />
         </div>
-        <div className="section-container w-full">
+        <div className="section-container w-full" dir={locale === 'he' ? 'rtl' : 'ltr'}>
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -100,7 +136,7 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
             </h1>
             <p
               className="font-body text-base mt-3"
-              style={{ color: 'rgba(232,213,183,0.5)', fontWeight: 300, letterSpacing: '0.04em' }}
+              style={{ color: 'rgba(232,213,183,0.9)', fontWeight: 400, letterSpacing: '0.04em' }}
             >
               {t.pageSubtext}
             </p>
@@ -112,13 +148,14 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
       <section className="relative">
         {events.length === 0 ? (
           <div className="section-container py-32 text-center">
-            <p className="font-display italic text-2xl" style={{ color: 'rgba(232,213,183,0.4)' }}>
+            <p className="font-display italic text-2xl" style={{ color: 'rgba(232,213,183,0.8)' }}>
               {t.noEvents}
             </p>
           </div>
         ) : (
           events.map((event, i) => {
-            const pricing = locale === 'he' ? event.pricingILS : event.pricingEUR
+            const { price: pricingVal } = getEventPricing(event, locale)
+            const eb = getEarlyBirdPricing(event, locale)
             const isOpen = event.status === 'open' || event.status === 'last-spots'
             const flipLayout = i % 2 !== 0
 
@@ -130,11 +167,11 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
                   minHeight: '78vh',
                   borderTop: i > 0 ? '1px solid rgba(232,213,183,0.05)' : undefined,
                 }}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 1.0, ease: 'easeOut' }}
               >
+                {/* Early Bird corner badge */}
+                {event.earlyBirdActive && <EarlyBirdCornerBadge locale={locale} />}
+
                 {/* Last Spots sticker */}
                 {event.status === 'last-spots' && (
                   <LastSpotsBadge label={t.lastSpots} />
@@ -144,7 +181,7 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
                 <div className="absolute inset-0">
                   <Image
                     src={event.heroImage}
-                    alt={event.title[locale]}
+                    alt=""
                     fill
                     className="object-cover"
                     style={{ objectPosition: 'center 35%' }}
@@ -162,7 +199,7 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 section-container w-full py-16 md:py-24">
+                <div className="relative z-10 section-container w-full py-16 md:py-24" dir={locale === 'he' ? 'rtl' : 'ltr'}>
                   <div
                     className={`flex flex-col gap-10 lg:gap-0 lg:flex-row lg:items-end ${
                       flipLayout ? 'lg:flex-row-reverse' : ''
@@ -171,7 +208,7 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
                     {/* Title + details */}
                     <motion.div
                       className="flex-1"
-                      initial={{ opacity: 0, y: 28 }}
+                      initial={{ y: 28 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-60px' }}
                       transition={{ duration: 0.95, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
@@ -191,9 +228,9 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
                             key={val}
                             className="font-body text-sm"
                             style={{
-                              color: 'rgba(232,213,183,0.52)',
+                              color: 'rgba(232,213,183,0.85)',
                               letterSpacing: '0.04em',
-                              fontWeight: 300,
+                              fontWeight: 400,
                             }}
                           >
                             {val}
@@ -205,28 +242,38 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
                     {/* Price + CTA */}
                     <motion.div
                       className={`flex flex-col gap-5 shrink-0 ${flipLayout ? 'lg:mr-auto lg:items-start' : 'lg:ml-auto lg:items-end'}`}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-60px' }}
                       transition={{ duration: 0.95, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     >
                       <div className={flipLayout ? 'text-left' : 'text-right lg:text-right'}>
-                        <p
-                          className="font-display font-light"
-                          style={{
-                            fontSize: 'clamp(2.4rem, 4vw, 3.5rem)',
-                            color: '#D4A853',
-                            lineHeight: 1,
-                          }}
-                        >
-                          {pricing}
-                        </p>
-                        {isOpen && (
+                        {eb ? (
+                          <div>
+                            <span style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#E8C87A', display: 'block', marginBottom: '0.3rem', fontWeight: 700 }}>
+                              ✦ {locale === 'he' ? 'מחיר ציפור מוקדמת' : 'Early Bird'}
+                            </span>
+                            <p className="font-display font-light" style={{ fontSize: 'clamp(2.4rem, 4vw, 3.5rem)', color: '#D4A853', lineHeight: 1 }}>
+                              {eb.earlyBird}
+                            </p>
+                            <p style={{ fontSize: '13px', color: 'rgba(232,213,183,0.4)', marginTop: '0.3rem', textDecoration: 'line-through' }}>
+                              {eb.regular}
+                            </p>
+                            {event.earlyBirdSpotsRemaining != null && (
+                              <p style={{ fontSize: '11px', color: 'rgba(232,213,183,0.5)', marginTop: '0.2rem', letterSpacing: '0.06em' }}>
+                                {event.earlyBirdSpotsRemaining} {locale === 'he' ? 'מקומות במחיר זה' : 'spots at this price'}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
                           <p
-                            className="font-body text-xs mt-1.5"
-                            style={{ color: 'rgba(212,168,83,0.5)', letterSpacing: '0.08em' }}
+                            className="font-display font-light"
+                            style={{ fontSize: 'clamp(2.4rem, 4vw, 3.5rem)', color: '#D4A853', lineHeight: 1 }}
                           >
-                            {event.spotsRemaining} {t.spotsLeft}
+                            <span style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#D4A853', display: 'block', marginBottom: '0.2rem', fontWeight: 600 }}>
+                              {locale === 'he' ? 'החל מ' : 'Starting from'}
+                            </span>
+                            {pricingVal}
                           </p>
                         )}
                       </div>
@@ -245,6 +292,6 @@ export default function EventsPageContent({ locale, events, t }: EventsPageConte
           })
         )}
       </section>
-    </>
+    </div>
   )
 }
