@@ -5,6 +5,7 @@ import LocaleDetector from '@/components/LocaleDetector'
 import AccessibilityWidget from '@/components/ui/AccessibilityWidget'
 import MetaPixel from '@/components/analytics/MetaPixel'
 import Clarity from '@/components/analytics/Clarity'
+import { GTMScript, GTMNoScript } from '@/components/analytics/GTM'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -73,6 +74,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir} className={fontClasses} data-scroll-behavior="smooth">
       <body>
+        <GTMNoScript />
         {/* Skip navigation — visually hidden, appears on focus (WCAG 2.4.1 / SI 5568) */}
         <a href="#main-content" className="skip-link">
           {skipLabel}
@@ -81,6 +83,7 @@ export default async function LocaleLayout({
         <LocaleDetector currentLocale={locale as Locale} />
         {children}
         <AccessibilityWidget locale={locale as Locale} />
+        <GTMScript />
         <MetaPixel />
         <Clarity />
       </body>
