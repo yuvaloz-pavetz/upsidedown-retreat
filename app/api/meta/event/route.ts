@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
   if (body.first_name) userData.fn = hash(body.first_name)
   if (body.last_name) userData.ln = hash(body.last_name)
 
-  const payload = {
+  const testCode = process.env.META_CAPI_TEST_CODE
+  const payload: Record<string, unknown> = {
     data: [{
       event_name: body.event_name,
       event_time: body.event_time ?? Math.floor(Date.now() / 1000),
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
       user_data: userData,
       custom_data: body.custom_data,
     }],
+    ...(testCode ? { test_event_code: testCode } : {}),
   }
 
   const res = await fetch(
