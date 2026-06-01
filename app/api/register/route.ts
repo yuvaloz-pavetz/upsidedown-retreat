@@ -91,6 +91,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // CAPI — Lead event (fire and forget, never block registration)
+    if (process.env.META_CAPI_TOKEN) {
+      const origin = req.headers.get('origin') ?? 'https://upsidedown-retreat.com'
+      void fetch(`${origin}/api/meta/event`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: 'Lead',
+          event_source_url: `${origin}/${locale}/events/${event_slug}`,
+          email,
+          phone,
+          first_name,
+          last_name,
+          client_ip: req.headers.get('x-forwarded-for')?.split(',')[0] ?? undefined,
+          client_user_agent: req.headers.get('user-agent') ?? undefined,
+          custom_data: { event_slug, tier_name, currency: 'ILS', value: default_amount },
+        }),
+      }).catch((e) => console.error('CAPI Lead error:', e))
+    }
+
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('Register route error:', err)

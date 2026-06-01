@@ -3,6 +3,8 @@ import { Cormorant_Garamond, Manrope, Frank_Ruhl_Libre, Heebo } from 'next/font/
 import type { Locale } from '@/lib/i18n'
 import LocaleDetector from '@/components/LocaleDetector'
 import AccessibilityWidget from '@/components/ui/AccessibilityWidget'
+import MetaPixel from '@/components/analytics/MetaPixel'
+import Clarity from '@/components/analytics/Clarity'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -79,6 +81,8 @@ export default async function LocaleLayout({
         <LocaleDetector currentLocale={locale as Locale} />
         {children}
         <AccessibilityWidget locale={locale as Locale} />
+        <MetaPixel />
+        <Clarity />
       </body>
     </html>
   )
