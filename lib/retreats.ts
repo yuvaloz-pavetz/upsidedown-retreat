@@ -81,9 +81,9 @@ export async function getRetreatBySlug(slug: string): Promise<Event | null> {
   const staticEvent = getEventBySlug(slug)
   if (staticEvent) {
     if (!event.heroImage?.startsWith('http') && staticEvent.heroImage?.startsWith('http')) event.heroImage = staticEvent.heroImage
-    if (!event.venueImages?.length && staticEvent.venueImages?.length) event.venueImages = staticEvent.venueImages
-    if (!event.venueDescriptionEn && staticEvent.venueDescriptionEn) event.venueDescriptionEn = staticEvent.venueDescriptionEn
-    if (!event.venueDescriptionHe && staticEvent.venueDescriptionHe) event.venueDescriptionHe = staticEvent.venueDescriptionHe
+    if (staticEvent.venueImages?.length) event.venueImages = staticEvent.venueImages
+    if (staticEvent.venueDescriptionEn) event.venueDescriptionEn = staticEvent.venueDescriptionEn
+    if (staticEvent.venueDescriptionHe) event.venueDescriptionHe = staticEvent.venueDescriptionHe
     if (!event.instagramUrls?.length && staticEvent.instagramUrls?.length) event.instagramUrls = staticEvent.instagramUrls
     if (staticEvent.galleryImages?.length) {
       const existing = new Set(event.galleryImages)
