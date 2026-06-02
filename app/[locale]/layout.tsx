@@ -4,7 +4,6 @@ import type { Locale } from '@/lib/i18n'
 import LocaleDetector from '@/components/LocaleDetector'
 import AccessibilityWidget from '@/components/ui/AccessibilityWidget'
 import MetaPixel from '@/components/analytics/MetaPixel'
-import Clarity from '@/components/analytics/Clarity'
 import { GTMScript, GTMNoScript } from '@/components/analytics/GTM'
 import GA4 from '@/components/analytics/GA4'
 
@@ -74,6 +73,12 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} className={fontClasses} data-scroll-behavior="smooth">
+      <head>
+        {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+        <script
+          dangerouslySetInnerHTML={{ __html: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","x0c8hndu1c");` }}
+        />
+      </head>
       <body>
         <GTMNoScript />
         {/* Skip navigation — visually hidden, appears on focus (WCAG 2.4.1 / SI 5568) */}
@@ -87,7 +92,6 @@ export default async function LocaleLayout({
         <GTMScript />
         <GA4 />
         <MetaPixel />
-        <Clarity />
       </body>
     </html>
   )
