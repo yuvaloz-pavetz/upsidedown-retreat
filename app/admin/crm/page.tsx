@@ -130,6 +130,7 @@ function ContactsView({ leads, events, onSelect, onDeleteContact }: ContactsView
 
 const BLANK_CONTACT = { first_name: '', last_name: '', email: '', phone: '', notes: '', locale: 'en' }
 const BLANK_EVENT_ROW = { slug: '', status: 'interested' as LeadStatus, amount: '' }
+const BLANK_COMPANION = { first_name: '', last_name: '', email: '', locale: 'en' }
 
 export default function CRMPage() {
   const [events, setEvents] = useState<EventSummary[]>([])
@@ -147,6 +148,9 @@ export default function CRMPage() {
   const [eventRows, setEventRows] = useState([{ ...BLANK_EVENT_ROW }])
   const [saving, setSaving] = useState(false)
   const [addErr, setAddErr] = useState('')
+  const [addingCompanionFor, setAddingCompanionFor] = useState<string | null>(null)
+  const [companionForm, setCompanionForm] = useState(BLANK_COMPANION)
+  const [savingCompanion, setSavingCompanion] = useState(false)
   const supabase = createClient()
 
   function openAddForm() {
@@ -250,6 +254,25 @@ export default function CRMPage() {
     ))
   }
 
+  async function saveCompanion(payerLead: Lead) {
+    if (!companionForm.first_name.trim() || !companionForm.last_name.trim()) return
+    setSavingCompanion(true)
+    const insert = [{
+      first_name: companionForm.first_name.trim(), last_name: companionForm.last_name.trim(),
+      email: companionForm.email.trim(), phone: '', notes: '', status: 'paid' as LeadStatus,
+      amount: '', event_slug: payerLead.event_slug, locale: companionForm.locale,
+      receipt_issued: false, companion_of: payerLead.id,
+    }]
+    const res = await fetch('/api/admin/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(insert) })
+    const json = await res.json() as { leads?: Lead[]; error?: string }
+    setSavingCompanion(false)
+    if (json.leads) {
+      setLeads(prev => [...json.leads!, ...prev])
+      setCompanionForm(BLANK_COMPANION)
+      setAddingCompanionFor(null)
+    }
+  }
+
   async function deleteLead(id: string, name: string) {
     if (!window.confirm(`Delete ${name}? This cannot be undone.`)) return
     setLeads(prev => prev.filter(l => l.id !== id))
@@ -279,6 +302,7 @@ export default function CRMPage() {
 
   const counts = ALL_STATUSES.reduce((acc, s) => { acc[s] = leads.filter(l => l.status === s).length; return acc }, {} as Record<LeadStatus, number>)
   const visibleLeads = leads.filter(l => !hiddenStatuses.has(l.status))
+  const leadById = new Map(leads.map(l => [l.id, l]))
 
   if (loading) return <AdminShell><p style={{ color: 'rgba(226,232,240,0.3)', fontSize: '0.85rem' }}>Loading...</p></AdminShell>
 
@@ -458,8 +482,12 @@ export default function CRMPage() {
                                   onClick={() => setSelectedContactEmail(lead.email)}
                                   title="View contact card"
                                 >
+                                  {lead.companion_of && (
+                                    <span style={{ fontSize: '0.58rem', color: '#5A9A6F', background: 'rgba(90,154,111,0.12)', borderRadius: 3, padding: '0.1rem 0.4rem', marginRight: '0.45rem', verticalAlign: 'middle' }}>↳ comp</span>
+                                  )}
                                   {lead.first_name} {lead.last_name}
                                   <span style={{ marginLeft: '0.35rem', fontSize: '0.6rem', color: 'rgba(212,168,83,0.45)' }}>›</span>
+                                  {lead.companion_of && (() => { const p = leadById.get(lead.companion_of!); return p ? <span style={{ display: 'block', fontSize: '0.58rem', color: 'rgba(90,154,111,0.5)', marginTop: '0.1rem' }}>of {p.first_name} {p.last_name}</span> : null })()}
                                 </td>
                                 <td style={cell}><a href={`mailto:${lead.email}`} style={{ color: '#D4A853', textDecoration: 'none' }}>{lead.email}</a></td>
                                 <td style={{ ...cell, color: 'rgba(226,232,240,0.4)' }}>{lead.phone || '—'}</td>
@@ -497,13 +525,40 @@ export default function CRMPage() {
                                 </td>
                                 <td style={{ ...cell, color: 'rgba(226,232,240,0.35)', fontSize: '0.75rem' }}>{new Date(lead.created_at).toLocaleDateString()}</td>
                                 <td style={{ ...cell, padding: '0.65rem 0.5rem' }}>
-                                  <button onClick={() => deleteLead(lead.id, `${lead.first_name} ${lead.last_name}`)} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(248,113,113,0.35)', fontSize: '1rem', padding: '2px 6px', transition: 'color 0.15s', lineHeight: 1 }}>✕</button>
+                                  <div style={{ display: 'flex', gap: '0.15rem', alignItems: 'center' }}>
+                                    {!lead.companion_of && (
+                                      <button
+                                        onClick={() => { setAddingCompanionFor(addingCompanionFor === lead.id ? null : lead.id); setCompanionForm(BLANK_COMPANION) }}
+                                        title="Add companion"
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: addingCompanionFor === lead.id ? '#D4A853' : 'rgba(90,154,111,0.45)', fontSize: '0.65rem', padding: '2px 5px', transition: 'color 0.15s', lineHeight: 1, whiteSpace: 'nowrap' }}
+                                      >+cmp</button>
+                                    )}
+                                    <button onClick={() => deleteLead(lead.id, `${lead.first_name} ${lead.last_name}`)} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(248,113,113,0.35)', fontSize: '1rem', padding: '2px 6px', transition: 'color 0.15s', lineHeight: 1 }}>✕</button>
+                                  </div>
                                 </td>
                               </tr>
                               {expanded && (
                                 <tr key={`${lead.id}-payments`}>
                                   <td colSpan={11} style={{ padding: 0 }}>
                                     <PaymentsPanel lead={lead} onSave={onPaymentsSave} />
+                                  </td>
+                                </tr>
+                              )}
+                              {addingCompanionFor === lead.id && (
+                                <tr key={`${lead.id}-companion`}>
+                                  <td colSpan={11} style={{ padding: '0 0 0.5rem 2.5rem', background: 'rgba(90,154,111,0.04)' }}>
+                                    <div style={{ padding: '0.65rem 0.75rem', borderLeft: '2px solid rgba(90,154,111,0.25)', display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                      <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(90,154,111,0.6)', marginRight: '0.25rem', flexShrink: 0 }}>↳ Companion</span>
+                                      <input value={companionForm.first_name} onChange={e => setCompanionForm(p => ({ ...p, first_name: e.target.value }))} placeholder="First name *" style={{ ...addInp, width: '120px' }} autoFocus />
+                                      <input value={companionForm.last_name} onChange={e => setCompanionForm(p => ({ ...p, last_name: e.target.value }))} placeholder="Last name *" style={{ ...addInp, width: '120px' }} />
+                                      <input type="email" value={companionForm.email} onChange={e => setCompanionForm(p => ({ ...p, email: e.target.value }))} placeholder="Email (optional)" style={{ ...addInp, width: '170px' }} />
+                                      <select value={companionForm.locale} onChange={e => setCompanionForm(p => ({ ...p, locale: e.target.value }))} style={{ ...addInp, width: 'auto', cursor: 'pointer', color: 'rgba(226,232,240,0.7)' }}>
+                                        <option value="en" style={{ background: '#0d1526' }}>EN</option>
+                                        <option value="he" style={{ background: '#0d1526' }}>עב</option>
+                                      </select>
+                                      <button onClick={() => saveCompanion(lead)} disabled={savingCompanion} style={{ background: 'rgba(90,154,111,0.15)', border: '1px solid rgba(90,154,111,0.3)', borderRadius: '4px', padding: '0.38rem 0.85rem', fontSize: '0.72rem', color: '#5A9A6F', cursor: 'pointer' }}>{savingCompanion ? '…' : 'Save'}</button>
+                                      <button onClick={() => { setAddingCompanionFor(null); setCompanionForm(BLANK_COMPANION) }} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px', padding: '0.38rem 0.75rem', fontSize: '0.72rem', color: 'rgba(226,232,240,0.3)', cursor: 'pointer' }}>Cancel</button>
+                                    </div>
                                   </td>
                                 </tr>
                               )}

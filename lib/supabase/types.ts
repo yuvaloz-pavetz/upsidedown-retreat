@@ -127,6 +127,7 @@ export interface Lead {
   freediving_level?: FreedivingLevel | null
   intake_token?: string | null
   intake_submitted_at?: string | null
+  companion_of?: string | null
 }
 
 export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'updated_at'>
