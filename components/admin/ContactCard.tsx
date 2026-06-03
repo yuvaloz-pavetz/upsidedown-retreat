@@ -53,7 +53,10 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
   const [saving, setSaving] = useState(false)
   const [intakeSent, setIntakeSent] = useState(false)
   const [sendingIntake, setSendingIntake] = useState(false)
+  const [intakeToken, setIntakeToken] = useState<string | null>(healthLead.intake_token ?? null)
+  const [copied, setCopied] = useState(false)
 
+  const [locale, setLocale] = useState(primary.locale ?? 'en')
   const [freedivingLevel, setFreedivingLevel] = useState<FreedivingLevel | ''>(primary.freediving_level ?? '')
   const [height, setHeight] = useState(healthLead.height?.toString() ?? '')
   const [weight, setWeight] = useState(healthLead.weight?.toString() ?? '')
@@ -72,6 +75,12 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
+  }
+
+  async function saveLocale(val: string) {
+    setLocale(val)
+    await patch({ byEmail: primary.email, locale: val })
+    for (const l of leads) onLeadChange(l.id, { locale: val })
   }
 
   async function saveFreedivingLevel(level: FreedivingLevel | '') {
@@ -96,15 +105,39 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
     setSaving(false)
   }
 
-  async function sendIntake() {
-    setSendingIntake(true)
-    await fetch('/api/leads/send-intake', {
+  async function callIntakeApi(sendEmail: boolean) {
+    const res = await fetch('/api/leads/send-intake', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: primary.email, first_name: primary.first_name, event_slug: primary.event_slug }),
+      body: JSON.stringify({ email: primary.email, first_name: primary.first_name, event_slug: primary.event_slug, locale, sendEmail }),
     })
+    const json = await res.json() as { ok?: boolean; token?: string; url?: string; error?: string }
+    if (json.token) {
+      setIntakeToken(json.token)
+      for (const l of leads) onLeadChange(l.id, { intake_token: json.token })
+    }
+    return json
+  }
+
+  async function sendIntake() {
+    setSendingIntake(true)
+    await callIntakeApi(true)
     setSendingIntake(false)
     setIntakeSent(true)
+  }
+
+  async function copyLink() {
+    let token = intakeToken
+    if (!token) {
+      const json = await callIntakeApi(false)
+      token = json.token ?? null
+    }
+    if (token) {
+      const url = `https://upsidedown-retreat.com/intake/${token}`
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   const tabBtn = (active: boolean): React.CSSProperties => ({
@@ -203,6 +236,19 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
                 </div>
               )}
 
+              {/* Language */}
+              <div style={row}>
+                <label style={fieldLabel}>Language</label>
+                <select
+                  value={locale}
+                  onChange={e => saveLocale(e.target.value)}
+                  style={{ ...inp, cursor: 'pointer' }}
+                >
+                  <option value="en" style={{ background: '#0d1526' }}>English</option>
+                  <option value="he" style={{ background: '#0d1526' }}>עברית</option>
+                </select>
+              </div>
+
               {/* Freediving level */}
               <div style={row}>
                 <label style={fieldLabel}>Freediving level (admin only)</label>
@@ -236,24 +282,37 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
                 padding: '0.65rem 0.9rem', borderRadius: '6px',
                 background: intakeDate ? 'rgba(90,154,111,0.08)' : 'rgba(255,255,255,0.03)',
                 border: `1px solid ${intakeDate ? 'rgba(90,154,111,0.2)' : 'rgba(255,255,255,0.06)'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem',
               }}>
                 <span style={{ fontSize: '0.78rem', color: intakeDate ? 'rgba(90,154,111,0.9)' : 'rgba(226,232,240,0.3)' }}>
                   {intakeDate ? `Intake submitted ${intakeDate}` : 'Intake form not yet submitted'}
                 </span>
-                <button
-                  onClick={sendIntake}
-                  disabled={sendingIntake}
-                  style={{
-                    background: 'rgba(212,168,83,0.1)', border: '1px solid rgba(212,168,83,0.25)',
-                    borderRadius: '4px', padding: '0.3rem 0.75rem', fontSize: '0.7rem',
-                    color: intakeSent ? 'rgba(90,154,111,0.9)' : '#D4A853',
-                    cursor: sendingIntake ? 'not-allowed' : 'pointer', opacity: sendingIntake ? 0.6 : 1,
-                    fontFamily: 'inherit', whiteSpace: 'nowrap',
-                  }}
-                >
-                  {intakeSent ? 'Sent!' : sendingIntake ? 'Sending…' : 'Send intake link'}
-                </button>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={copyLink}
+                    style={{
+                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '4px', padding: '0.3rem 0.75rem', fontSize: '0.7rem',
+                      color: copied ? 'rgba(90,154,111,0.9)' : 'rgba(226,232,240,0.5)',
+                      cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {copied ? 'Copied!' : 'Copy link'}
+                  </button>
+                  <button
+                    onClick={sendIntake}
+                    disabled={sendingIntake}
+                    style={{
+                      background: 'rgba(212,168,83,0.1)', border: '1px solid rgba(212,168,83,0.25)',
+                      borderRadius: '4px', padding: '0.3rem 0.75rem', fontSize: '0.7rem',
+                      color: intakeSent ? 'rgba(90,154,111,0.9)' : '#D4A853',
+                      cursor: sendingIntake ? 'not-allowed' : 'pointer', opacity: sendingIntake ? 0.6 : 1,
+                      fontFamily: 'inherit', whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {intakeSent ? 'Sent!' : sendingIntake ? 'Sending…' : 'Send intake email'}
+                  </button>
+                </div>
               </div>
 
               {/* Measurements */}

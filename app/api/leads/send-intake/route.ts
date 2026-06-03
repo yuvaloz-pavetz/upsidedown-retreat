@@ -12,59 +12,139 @@ async function requireAdmin() {
   return user
 }
 
+const LOGO = 'https://upsidedown-retreat.com/images/UpsideDown%20Retreat%20-%20LOGO.png'
+
+function emailEn(firstName: string, url: string, eventSlug?: string) {
+  return {
+    subject: 'Please fill in your details for the retreat',
+    html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,sans-serif">
+<div style="max-width:560px;margin:32px auto;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
+  <div style="background:#0B1D2A;padding:36px 40px 28px;text-align:center">
+    <img src="${LOGO}" alt="UpsideDown Retreat" style="max-height:54px;max-width:180px" />
+    <p style="margin:10px 0 0;color:#D4A853;font-size:10px;letter-spacing:0.22em;text-transform:uppercase">FREEDIVING RETREAT</p>
+  </div>
+  <div style="background:#ffffff;padding:40px">
+    <h2 style="margin:0 0 14px;color:#0B1D2A;font-size:21px;font-weight:700">Hi ${firstName},</h2>
+    <p style="color:#555;line-height:1.75;margin:0 0 14px;font-size:15px">
+      We're getting closer to the retreat${eventSlug ? ` (${eventSlug})` : ''}!
+    </p>
+    <p style="color:#555;line-height:1.75;margin:0 0 32px;font-size:15px">
+      Please take 2&nbsp;minutes to fill in your personal details — gear sizes, dietary needs, and more — so we can prepare everything perfectly for you.
+    </p>
+    <div style="text-align:center;margin-bottom:32px">
+      <a href="${url}" style="display:inline-block;background:#D4A853;color:#0B1D2A;padding:15px 38px;text-decoration:none;font-weight:700;border-radius:5px;font-size:15px;letter-spacing:0.03em">
+        Fill in my details →
+      </a>
+    </div>
+    <p style="font-size:12px;color:#aaa;line-height:1.6;margin:0">
+      This link is personal to you. You can return and update your details at any time before the retreat.
+    </p>
+  </div>
+  <div style="background:#f8f8f8;padding:18px 40px;text-align:center;border-top:1px solid #eee">
+    <p style="margin:0;font-size:12px;color:#bbb">UpsideDown Retreat &nbsp;·&nbsp;
+      <a href="mailto:info@upsidedown-retreat.com" style="color:#D4A853;text-decoration:none">info@upsidedown-retreat.com</a>
+    </p>
+  </div>
+</div>
+</body></html>`,
+  }
+}
+
+function emailHe(firstName: string, url: string, eventSlug?: string) {
+  return {
+    subject: 'מלאו את הפרטים שלכם לריטריט',
+    html: `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,sans-serif;direction:rtl">
+<div style="max-width:560px;margin:32px auto;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
+  <div style="background:#0B1D2A;padding:36px 40px 28px;text-align:center">
+    <img src="${LOGO}" alt="UpsideDown Retreat" style="max-height:54px;max-width:180px" />
+    <p style="margin:10px 0 0;color:#D4A853;font-size:10px;letter-spacing:0.15em;text-transform:uppercase">ריטריט צלילה חופשית</p>
+  </div>
+  <div style="background:#ffffff;padding:40px;direction:rtl;text-align:right">
+    <h2 style="margin:0 0 14px;color:#0B1D2A;font-size:21px;font-weight:700">שלום ${firstName},</h2>
+    <p style="color:#555;line-height:1.85;margin:0 0 14px;font-size:15px">
+      אנחנו מתקרבים לריטריט${eventSlug ? ` (${eventSlug})` : ''}!
+    </p>
+    <p style="color:#555;line-height:1.85;margin:0 0 32px;font-size:15px">
+      אנחנו מבקשים שתקדישו כ-2 דקות למילוי פרטים אישיים — מידות ציוד, העדפות תזונה ועוד — כדי שנוכל להכין הכול עבורכם.
+    </p>
+    <div style="text-align:center;margin-bottom:32px">
+      <a href="${url}" style="display:inline-block;background:#D4A853;color:#0B1D2A;padding:15px 38px;text-decoration:none;font-weight:700;border-radius:5px;font-size:15px">
+        → מלאו את הפרטים שלי
+      </a>
+    </div>
+    <p style="font-size:12px;color:#aaa;line-height:1.6;margin:0">
+      הקישור הזה אישי עבורכם. אפשר לחזור ולעדכן את הפרטים בכל עת לפני הריטריט.
+    </p>
+  </div>
+  <div style="background:#f8f8f8;padding:18px 40px;text-align:center;border-top:1px solid #eee">
+    <p style="margin:0;font-size:12px;color:#bbb">UpsideDown Retreat &nbsp;·&nbsp;
+      <a href="mailto:info@upsidedown-retreat.com" style="color:#D4A853;text-decoration:none">info@upsidedown-retreat.com</a>
+    </p>
+  </div>
+</div>
+</body></html>`,
+  }
+}
+
 export async function POST(req: NextRequest) {
   const caller = await requireAdmin()
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { email, first_name, event_slug } = await req.json() as {
-    email: string
-    first_name: string
-    event_slug?: string
+  const body = await req.json() as {
+    email: string; first_name: string; event_slug?: string
+    locale?: string; sendEmail?: boolean
   }
+  const { email, first_name, event_slug, locale = 'en', sendEmail = true } = body
 
   if (!email) return NextResponse.json({ error: 'Missing email' }, { status: 400 })
 
-  const token = crypto.randomUUID()
   const admin = createAdminClient()
 
-  // Save token to all leads for this email
-  const { error } = await admin.from('leads').update({ intake_token: token }).eq('email', email)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  // Reuse existing token to avoid invalidating previously sent links
+  const { data: existing } = await admin
+    .from('leads')
+    .select('intake_token')
+    .eq('email', email)
+    .not('intake_token', 'is', null)
+    .limit(1)
+    .maybeSingle()
 
-  const apiKey = process.env.BREVO_API_KEY
-  const senderEmail = process.env.BREVO_SENDER_EMAIL ?? 'noreply@upsidedown-retreat.com'
-  const formUrl = `https://upsidedown-retreat.com/en/intake/${token}`
+  const token: string = existing?.intake_token ?? crypto.randomUUID()
 
-  if (apiKey) {
-    const html = `
-      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#1a2a3a">
-        <h2 style="margin-bottom:8px">Hi ${first_name},</h2>
-        <p style="color:#444;line-height:1.6">
-          We're getting closer to the retreat${event_slug ? ` (${event_slug})` : ''}!
-          Please take 2 minutes to fill out your personal details so we can prepare everything for you.
-        </p>
-        <p style="margin:28px 0">
-          <a href="${formUrl}"
-             style="display:inline-block;background:#D4A853;color:#0B1D2A;padding:14px 32px;text-decoration:none;font-weight:700;border-radius:4px;font-size:15px">
-            Fill in my details
-          </a>
-        </p>
-        <p style="font-size:12px;color:#888">
-          This link is personal to you. You can fill in the form at any time before the retreat.
-        </p>
-      </div>
-    `
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+  if (!existing?.intake_token) {
+    const { error } = await admin.from('leads').update({ intake_token: token }).eq('email', email)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  const url = `https://upsidedown-retreat.com/intake/${token}`
+
+  if (sendEmail) {
+    const apiKey = process.env.BREVO_API_KEY
+    if (!apiKey) return NextResponse.json({ error: 'BREVO_API_KEY not configured' }, { status: 500 })
+
+    const senderEmail = process.env.BREVO_SENDER_EMAIL ?? 'noreply@upsidedown-retreat.com'
+    const { subject, html } = locale === 'he'
+      ? emailHe(first_name, url, event_slug)
+      : emailEn(first_name, url, event_slug)
+
+    const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
       body: JSON.stringify({
         sender: { name: 'UpsideDown Retreat', email: senderEmail },
         to: [{ email, name: first_name }],
-        subject: 'Please fill in your details for the retreat',
+        subject,
         htmlContent: html,
       }),
     })
+
+    if (!brevoRes.ok) {
+      const text = await brevoRes.text()
+      return NextResponse.json({ error: `Brevo: ${text}` }, { status: 500 })
+    }
   }
 
-  return NextResponse.json({ ok: true, token })
+  return NextResponse.json({ ok: true, token, url })
 }

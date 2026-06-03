@@ -128,7 +128,7 @@ function ContactsView({ leads, events, onSelect, onDeleteContact }: ContactsView
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 
-const BLANK_CONTACT = { first_name: '', last_name: '', email: '', phone: '', notes: '' }
+const BLANK_CONTACT = { first_name: '', last_name: '', email: '', phone: '', notes: '', locale: 'en' }
 const BLANK_EVENT_ROW = { slug: '', status: 'interested' as LeadStatus, amount: '' }
 
 export default function CRMPage() {
@@ -203,7 +203,7 @@ export default function CRMPage() {
       first_name: form.first_name.trim(), last_name: form.last_name.trim(),
       email: form.email.trim(), phone: form.phone.trim(), notes: form.notes.trim(),
       status: r.status, amount: r.amount.trim(), event_slug: r.slug,
-      locale: 'en', receipt_issued: false,
+      locale: form.locale, receipt_issued: false,
     }))
     const res = await fetch('/api/admin/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inserts) })
     const json = await res.json() as { leads?: Lead[]; error?: string }
@@ -339,10 +339,15 @@ export default function CRMPage() {
                     <input value={form.first_name} onChange={e => setForm(p => ({ ...p, first_name: e.target.value }))} placeholder="First name *" style={addInp} />
                     <input value={form.last_name} onChange={e => setForm(p => ({ ...p, last_name: e.target.value }))} placeholder="Last name *" style={addInp} />
                   </div>
-                  <div className="crm-add-contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <div className="crm-add-contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
                     <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="Email *" style={addInp} />
                     <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="Phone" style={addInp} />
                   </div>
+                  <select value={form.locale} onChange={e => setForm(p => ({ ...p, locale: e.target.value }))}
+                    style={{ ...addInp, cursor: 'pointer', width: 'auto', color: 'rgba(226,232,240,0.7)' }}>
+                    <option value="en" style={{ background: '#0d1526' }}>English</option>
+                    <option value="he" style={{ background: '#0d1526' }}>עברית</option>
+                  </select>
                 </div>
 
                 {/* Event rows */}
@@ -448,7 +453,14 @@ export default function CRMPage() {
                                     {expanded ? '▾' : '▸'}{payCount > 0 ? <span style={{ fontSize: '0.65rem', marginLeft: '2px' }}>{payCount}</span> : ''}
                                   </button>
                                 </td>
-                                <td style={cell}>{lead.first_name} {lead.last_name}</td>
+                                <td
+                                  style={{ ...cell, cursor: 'pointer' }}
+                                  onClick={() => setSelectedContactEmail(lead.email)}
+                                  title="View contact card"
+                                >
+                                  {lead.first_name} {lead.last_name}
+                                  <span style={{ marginLeft: '0.35rem', fontSize: '0.6rem', color: 'rgba(212,168,83,0.45)' }}>›</span>
+                                </td>
                                 <td style={cell}><a href={`mailto:${lead.email}`} style={{ color: '#D4A853', textDecoration: 'none' }}>{lead.email}</a></td>
                                 <td style={{ ...cell, color: 'rgba(226,232,240,0.4)' }}>{lead.phone || '—'}</td>
                                 <td style={{ ...cell, fontSize: '0.72rem', color: 'rgba(226,232,240,0.4)' }}>{lead.event_slug}</td>
