@@ -58,6 +58,7 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
     leads.find(l => l.intake_token)?.intake_token ?? null
   )
   const [copied, setCopied] = useState(false)
+  const [intakeError, setIntakeError] = useState<string | null>(null)
 
   const [locale, setLocale] = useState(primary.locale ?? 'en')
   const [freedivingLevel, setFreedivingLevel] = useState<FreedivingLevel | ''>(primary.freediving_level ?? '')
@@ -109,17 +110,25 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
   }
 
   async function callIntakeApi(sendEmail: boolean) {
-    const res = await fetch('/api/leads/send-intake', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: primary.email, first_name: primary.first_name, event_slug: primary.event_slug, locale, sendEmail }),
-    })
-    const json = await res.json() as { ok?: boolean; token?: string; url?: string; error?: string }
-    if (json.token) {
-      setIntakeToken(json.token)
-      for (const l of leads) onLeadChange(l.id, { intake_token: json.token })
+    setIntakeError(null)
+    try {
+      const res = await fetch('/api/leads/send-intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: primary.email, first_name: primary.first_name, event_slug: primary.event_slug, locale, sendEmail }),
+      })
+      const json = await res.json() as { ok?: boolean; token?: string; url?: string; error?: string }
+      if (json.error) { setIntakeError(json.error); return json }
+      if (json.token) {
+        setIntakeToken(json.token)
+        for (const l of leads) onLeadChange(l.id, { intake_token: json.token })
+      }
+      return json
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Network error'
+      setIntakeError(msg)
+      return { error: msg }
     }
-    return json
   }
 
   async function sendIntake() {
@@ -328,6 +337,12 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
                   </button>
                 </div>
               </div>
+
+              {intakeError && (
+                <div style={{ padding: '0.6rem 0.8rem', borderRadius: '5px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', fontSize: '0.75rem', color: '#f87171', wordBreak: 'break-all' }}>
+                  Error: {intakeError}
+                </div>
+              )}
 
               {/* Measurements */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
