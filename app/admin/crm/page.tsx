@@ -591,6 +591,7 @@ export default function CRMPage() {
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
                                 <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: STATUS_COLOR[lead.status], flexShrink: 0 }} />
                                 <span style={{ fontSize: '0.97rem', color: '#e2e8f0', fontWeight: 500 }}>
+                                  {lead.companion_of && <span style={{ fontSize: '0.6rem', color: '#5A9A6F', background: 'rgba(90,154,111,0.12)', borderRadius: 3, padding: '0.1rem 0.4rem', marginRight: '0.4rem', verticalAlign: 'middle' }}>↳ comp</span>}
                                   {lead.first_name} {lead.last_name}
                                 </span>
                                 {payCount > 0 && (
@@ -688,7 +689,7 @@ export default function CRMPage() {
                               </div>
 
                               {/* Action buttons */}
-                              <div style={{ padding: '0 1rem 0.9rem', display: 'flex', gap: '0.5rem' }}>
+                              <div style={{ padding: '0 1rem 0.9rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                 <a href={`mailto:${lead.email}`} onClick={e => e.stopPropagation()} style={{
                                   flex: 1, textAlign: 'center', padding: '0.6rem', borderRadius: '6px',
                                   background: 'rgba(212,168,83,0.08)', border: '1px solid rgba(212,168,83,0.2)',
@@ -705,6 +706,19 @@ export default function CRMPage() {
                                     Call
                                   </a>
                                 )}
+                                {!lead.companion_of && (
+                                  <button
+                                    onClick={e => { e.stopPropagation(); setAddingCompanionFor(addingCompanionFor === lead.id ? null : lead.id); setCompanionForm(BLANK_COMPANION) }}
+                                    style={{
+                                      padding: '0.6rem 0.75rem', borderRadius: '6px',
+                                      background: addingCompanionFor === lead.id ? 'rgba(90,154,111,0.18)' : 'rgba(90,154,111,0.07)',
+                                      border: '1px solid rgba(90,154,111,0.25)',
+                                      color: '#5A9A6F', fontSize: '0.78rem', cursor: 'pointer',
+                                    }}
+                                  >
+                                    + Companion
+                                  </button>
+                                )}
                                 <button
                                   onClick={e => { e.stopPropagation(); void deleteLead(lead.id, `${lead.first_name} ${lead.last_name}`) }}
                                   style={{
@@ -716,6 +730,26 @@ export default function CRMPage() {
                                   Delete
                                 </button>
                               </div>
+
+                              {/* Companion form */}
+                              {addingCompanionFor === lead.id && (
+                                <div style={{ margin: '0 1rem 1rem', padding: '0.75rem', borderLeft: '2px solid rgba(90,154,111,0.25)', background: 'rgba(90,154,111,0.04)', borderRadius: '0 6px 6px 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                  <span style={{ fontSize: '0.6rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(90,154,111,0.6)' }}>↳ Add Companion</span>
+                                  <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                    <input value={companionForm.first_name} onChange={e => setCompanionForm(p => ({ ...p, first_name: e.target.value }))} placeholder="First name *" style={{ ...addInp, flex: 1 }} />
+                                    <input value={companionForm.last_name} onChange={e => setCompanionForm(p => ({ ...p, last_name: e.target.value }))} placeholder="Last name *" style={{ ...addInp, flex: 1 }} />
+                                  </div>
+                                  <input type="email" value={companionForm.email} onChange={e => setCompanionForm(p => ({ ...p, email: e.target.value }))} placeholder="Email (optional)" style={addInp} />
+                                  <select value={companionForm.locale} onChange={e => setCompanionForm(p => ({ ...p, locale: e.target.value }))} style={{ ...addInp, cursor: 'pointer', color: 'rgba(226,232,240,0.7)' }}>
+                                    <option value="en" style={{ background: '#0d1526' }}>English</option>
+                                    <option value="he" style={{ background: '#0d1526' }}>עברית</option>
+                                  </select>
+                                  <div style={{ display: 'flex', gap: '0.4rem' }}>
+                                    <button onClick={() => saveCompanion(lead)} disabled={savingCompanion} style={{ flex: 1, background: 'rgba(90,154,111,0.18)', border: '1px solid rgba(90,154,111,0.3)', borderRadius: '4px', padding: '0.5rem', fontSize: '0.78rem', color: '#5A9A6F', cursor: 'pointer' }}>{savingCompanion ? '…' : 'Save'}</button>
+                                    <button onClick={() => { setAddingCompanionFor(null); setCompanionForm(BLANK_COMPANION) }} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '4px', padding: '0.5rem 0.75rem', fontSize: '0.78rem', color: 'rgba(226,232,240,0.3)', cursor: 'pointer' }}>Cancel</button>
+                                  </div>
+                                </div>
+                              )}
 
                               {/* Payments */}
                               <PaymentsPanel lead={lead} onSave={onPaymentsSave} />
