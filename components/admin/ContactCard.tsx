@@ -47,23 +47,26 @@ interface Props {
 
 export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSave }: Props) {
   const primary = leads[0]
-  const healthLead = leads.find(l => l.intake_submitted_at) ?? leads[0]
+  // Only pre-fill health fields if the contact actually submitted the intake form
+  const submittedLead = leads.find(l => l.intake_submitted_at) ?? null
 
   const [tab, setTab] = useState<'profile' | 'gear' | 'payments'>('profile')
   const [saving, setSaving] = useState(false)
   const [intakeSent, setIntakeSent] = useState(false)
   const [sendingIntake, setSendingIntake] = useState(false)
-  const [intakeToken, setIntakeToken] = useState<string | null>(healthLead.intake_token ?? null)
+  const [intakeToken, setIntakeToken] = useState<string | null>(
+    leads.find(l => l.intake_token)?.intake_token ?? null
+  )
   const [copied, setCopied] = useState(false)
 
   const [locale, setLocale] = useState(primary.locale ?? 'en')
   const [freedivingLevel, setFreedivingLevel] = useState<FreedivingLevel | ''>(primary.freediving_level ?? '')
-  const [height, setHeight] = useState(healthLead.height?.toString() ?? '')
-  const [weight, setWeight] = useState(healthLead.weight?.toString() ?? '')
-  const [shoeSize, setShoeSize] = useState(healthLead.shoe_size ?? '')
-  const [hasDiveGear, setHasDiveGear] = useState(healthLead.has_dive_gear ?? false)
-  const [gearItems, setGearItems] = useState<string[]>(healthLead.gear_items ?? [])
-  const [foodAllergies, setFoodAllergies] = useState(healthLead.food_allergies ?? '')
+  const [height, setHeight] = useState(submittedLead?.height?.toString() ?? '')
+  const [weight, setWeight] = useState(submittedLead?.weight?.toString() ?? '')
+  const [shoeSize, setShoeSize] = useState(submittedLead?.shoe_size ?? '')
+  const [hasDiveGear, setHasDiveGear] = useState(submittedLead?.has_dive_gear ?? false)
+  const [gearItems, setGearItems] = useState<string[]>(submittedLead?.gear_items ?? [])
+  const [foodAllergies, setFoodAllergies] = useState(submittedLead?.food_allergies ?? '')
 
   function toggleGear(v: string) {
     setGearItems(prev => prev.includes(v) ? prev.filter(g => g !== v) : [...prev, v])
@@ -132,12 +135,23 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
       const json = await callIntakeApi(false)
       token = json.token ?? null
     }
-    if (token) {
-      const url = `https://upsidedown-retreat.com/intake/${token}`
+    if (!token) return
+    const url = `https://upsidedown-retreat.com/intake/${token}`
+    try {
       await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for browsers that block clipboard API
+      const el = document.createElement('textarea')
+      el.value = url
+      el.style.cssText = 'position:fixed;opacity:0;pointer-events:none'
+      document.body.appendChild(el)
+      el.focus()
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
     }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
   }
 
   const tabBtn = (active: boolean): React.CSSProperties => ({
@@ -148,8 +162,8 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
     fontFamily: 'inherit',
   })
 
-  const intakeDate = healthLead.intake_submitted_at
-    ? new Date(healthLead.intake_submitted_at).toLocaleDateString()
+  const intakeDate = submittedLead?.intake_submitted_at
+    ? new Date(submittedLead.intake_submitted_at).toLocaleDateString()
     : null
 
   return (
