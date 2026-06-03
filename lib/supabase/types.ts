@@ -99,6 +99,8 @@ export interface Payment {
   notes: string
 }
 
+export type FreedivingLevel = 'basic_course' | 'advanced_course' | 'guided_training'
+
 export interface Lead {
   id: string
   first_name: string
@@ -115,6 +117,16 @@ export interface Lead {
   currency: string
   created_at: string
   updated_at: string
+  // Intake fields
+  height?: number | null
+  weight?: number | null
+  shoe_size?: string | null
+  has_dive_gear?: boolean | null
+  gear_items?: string[] | null
+  food_allergies?: string | null
+  freediving_level?: FreedivingLevel | null
+  intake_token?: string | null
+  intake_submitted_at?: string | null
 }
 
 export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'updated_at'>

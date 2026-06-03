@@ -35,9 +35,18 @@ export async function PATCH(req: NextRequest) {
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { id, ...updates } = await req.json() as { id: string; [key: string]: unknown }
-    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+    const body = await req.json() as { id?: string; byEmail?: string; [key: string]: unknown }
+    const { id, byEmail, ...updates } = body
     const admin = createAdminClient()
+
+    if (byEmail) {
+      // Update all leads for a given email (for contact-level fields)
+      const { error } = await admin.from('leads').update(updates).eq('email', byEmail)
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ ok: true })
+    }
+
+    if (!id) return NextResponse.json({ error: 'Missing id or byEmail' }, { status: 400 })
     const { error } = await admin.from('leads').update(updates).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ ok: true })

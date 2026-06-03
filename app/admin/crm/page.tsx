@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 import PaymentsPanel from '@/components/admin/PaymentsPanel'
+import ContactCard from '@/components/admin/ContactCard'
 import type { Lead, LeadStatus, Payment } from '@/lib/supabase/types'
 
 const CURRENCIES = ['ILS', 'EUR', 'USD']
@@ -44,7 +45,14 @@ interface Contact {
   events: { slug: string; title: string; status: LeadStatus; amount: string }[]
 }
 
-function ContactsView({ leads, events }: { leads: Lead[]; events: EventSummary[] }) {
+interface ContactsViewProps {
+  leads: Lead[]
+  events: EventSummary[]
+  onSelect: (email: string) => void
+  onDeleteContact: (email: string) => void
+}
+
+function ContactsView({ leads, events, onSelect, onDeleteContact }: ContactsViewProps) {
   const slugToTitle = new Map(events.map(r => [r.slug, r.title_en]))
   const map = new Map<string, Contact>()
 
@@ -73,20 +81,23 @@ function ContactsView({ leads, events }: { leads: Lead[]; events: EventSummary[]
       <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
         <thead>
           <tr>
-            {['Name', 'Email', 'Phone', 'Events'].map(h => (
-              <th key={h} style={{ ...head, textAlign: 'left' }}>{h}</th>
+            {['Name', 'Email', 'Phone', 'Events', ''].map((h, i) => (
+              <th key={i} style={{ ...head, textAlign: 'left' }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {contacts.map(c => (
             <tr key={c.email}>
-              <td style={cell}>{c.first_name} {c.last_name}</td>
-              <td style={cell}>
-                <a href={`mailto:${c.email}`} style={{ color: '#D4A853', textDecoration: 'none' }}>{c.email}</a>
+              <td style={{ ...cell, cursor: 'pointer' }} onClick={() => onSelect(c.email)}>
+                <span style={{ color: '#e2e8f0' }}>{c.first_name} {c.last_name}</span>
+                <span style={{ marginLeft: '0.4rem', fontSize: '0.65rem', color: 'rgba(212,168,83,0.5)' }}>›</span>
               </td>
-              <td style={{ ...cell, color: 'rgba(226,232,240,0.4)' }}>{c.phone || '—'}</td>
-              <td style={cell}>
+              <td style={{ ...cell, cursor: 'pointer' }} onClick={() => onSelect(c.email)}>
+                <span style={{ color: '#D4A853' }}>{c.email}</span>
+              </td>
+              <td style={{ ...cell, color: 'rgba(226,232,240,0.4)', cursor: 'pointer' }} onClick={() => onSelect(c.email)}>{c.phone || '—'}</td>
+              <td style={{ ...cell, cursor: 'pointer' }} onClick={() => onSelect(c.email)}>
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                   {c.events.map(ev => (
                     <span key={ev.slug} style={{
@@ -99,6 +110,13 @@ function ContactsView({ leads, events }: { leads: Lead[]; events: EventSummary[]
                     </span>
                   ))}
                 </div>
+              </td>
+              <td style={{ ...cell, padding: '0.65rem 0.5rem' }}>
+                <button
+                  onClick={() => onDeleteContact(c.email)}
+                  title="Delete contact"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(248,113,113,0.35)', fontSize: '1rem', padding: '2px 6px', transition: 'color 0.15s', lineHeight: 1 }}
+                >✕</button>
               </td>
             </tr>
           ))}
@@ -121,6 +139,7 @@ export default function CRMPage() {
   const [loading, setLoading] = useState(true)
   const [hiddenStatuses, setHiddenStatuses] = useState<Set<LeadStatus>>(new Set(['irrelevant']))
   const [expandedLeadId, setExpandedLeadId] = useState<string | null>(null)
+  const [selectedContactEmail, setSelectedContactEmail] = useState<string | null>(null)
   const [editingAmount, setEditingAmount] = useState<string | null>(null)
   const [amountDraft, setAmountDraft] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
@@ -213,6 +232,22 @@ export default function CRMPage() {
   async function updateCurrency(id: string, currency: string) {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, currency } : l))
     await fetch('/api/admin/leads', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, currency }) })
+  }
+
+  function onLeadChange(id: string, updates: Partial<Lead>) {
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, ...updates } : l))
+  }
+
+  async function deleteContact(email: string) {
+    const name = leads.find(l => l.email === email)
+    const displayName = name ? `${name.first_name} ${name.last_name}` : email
+    if (!window.confirm(`Delete all data for ${displayName}? This cannot be undone.`)) return
+    const toDelete = leads.filter(l => l.email === email)
+    setLeads(prev => prev.filter(l => l.email !== email))
+    if (selectedContactEmail === email) setSelectedContactEmail(null)
+    await Promise.all(toDelete.map(l =>
+      fetch(`/api/admin/leads?id=${encodeURIComponent(l.id)}`, { method: 'DELETE' })
+    ))
   }
 
   async function deleteLead(id: string, name: string) {
@@ -351,7 +386,14 @@ export default function CRMPage() {
           </div>
 
           {/* Contacts view */}
-          {view === 'contacts' && <ContactsView leads={leads} events={events} />}
+          {view === 'contacts' && (
+            <ContactsView
+              leads={leads}
+              events={events}
+              onSelect={email => setSelectedContactEmail(email)}
+              onDeleteContact={deleteContact}
+            />
+          )}
 
           {/* Events view */}
           {view === 'events' && (
@@ -622,6 +664,15 @@ export default function CRMPage() {
           )}
         </div>
       </div>
+
+      {selectedContactEmail && leads.filter(l => l.email === selectedContactEmail).length > 0 && (
+        <ContactCard
+          leads={leads.filter(l => l.email === selectedContactEmail)}
+          onClose={() => setSelectedContactEmail(null)}
+          onLeadChange={onLeadChange}
+          onPaymentsSave={onPaymentsSave}
+        />
+      )}
     </AdminShell>
   )
 }
