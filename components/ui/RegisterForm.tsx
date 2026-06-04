@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useId } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import type { Locale } from '@/lib/i18n'
@@ -71,6 +72,7 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
   const t = copy[locale] ?? copy.en
   const isHe = locale === 'he'
   const uid = useId()
+  const router = useRouter()
 
   const hasTiers = (tiers?.length ?? 0) > 1
   const [selectedTierId, setSelectedTierId] = useState<string | null>(defaultTierId ?? tiers?.[0]?.id ?? null)
@@ -123,7 +125,6 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
       const json = await res.json() as { ok?: boolean; duplicate?: boolean }
       if (json.duplicate) { setFormStatus('duplicate'); return }
       if (res.ok && json.ok) {
-        setFormStatus('success')
         const eventId = crypto.randomUUID()
         trackEvent('Lead', { content_name: eventSlug }, { eventID: eventId })
         const fbc = document.cookie.match(/_fbc=([^;]*)/)?.[1]
@@ -141,6 +142,7 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
             custom_data: { content_name: eventSlug },
           }),
         })
+        router.push(`/${locale}/thank-you`)
       } else {
         setFormStatus('error')
       }
