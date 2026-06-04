@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { Locale } from '@/lib/i18n'
 import type { PricingTier } from '@/lib/events'
 import { formatTierPrice } from '@/lib/events'
+import { trackEvent } from '@/components/analytics/MetaPixel'
 
 interface RegisterFormProps {
   eventSlug: string
@@ -121,7 +122,28 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
       })
       const json = await res.json() as { ok?: boolean; duplicate?: boolean }
       if (json.duplicate) { setFormStatus('duplicate'); return }
-      setFormStatus(res.ok && json.ok ? 'success' : 'error')
+      if (res.ok && json.ok) {
+        setFormStatus('success')
+        const eventId = crypto.randomUUID()
+        trackEvent('Lead', { content_name: eventSlug }, { eventID: eventId })
+        const fbc = document.cookie.match(/_fbc=([^;]*)/)?.[1]
+        const fbp = document.cookie.match(/_fbp=([^;]*)/)?.[1]
+        void fetch('/api/meta/event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_name: 'Lead',
+            event_id: eventId,
+            event_source_url: window.location.href,
+            email, phone: phone || undefined,
+            first_name: firstName, last_name: lastName,
+            fbc, fbp,
+            custom_data: { content_name: eventSlug },
+          }),
+        })
+      } else {
+        setFormStatus('error')
+      }
     } catch {
       setFormStatus('error')
     }

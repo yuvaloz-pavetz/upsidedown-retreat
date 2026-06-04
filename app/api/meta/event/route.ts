@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json() as {
     event_name: string
+    event_id?: string
     event_time?: number
     event_source_url?: string
     email?: string
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
   const payload: Record<string, unknown> = {
     data: [{
       event_name: body.event_name,
+      event_id: body.event_id,
       event_time: body.event_time ?? Math.floor(Date.now() / 1000),
       event_source_url: body.event_source_url,
       action_source: 'website',
