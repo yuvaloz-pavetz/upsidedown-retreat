@@ -85,7 +85,7 @@ export interface WaitlistEntry {
   created_at: string
 }
 
-export type LeadStatus = 'interested' | 'partially_paid' | 'paid' | 'past' | 'irrelevant'
+export type LeadStatus = 'interested' | 'email_sent' | 'partially_paid' | 'paid' | 'past' | 'irrelevant'
 
 export type PaymentMethod = 'bank' | 'cash' | 'credit' | 'paypal' | 'other'
 

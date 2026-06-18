@@ -11,16 +11,17 @@ const CURRENCIES = ['ILS', 'EUR', 'USD']
 
 const STATUS_COLOR: Record<LeadStatus, string> = {
   interested:     '#4A9BB8',
+  email_sent:     '#9B7FD4',
   partially_paid: '#D4A853',
   paid:           '#5A9A6F',
   past:           'rgba(226,232,240,0.35)',
   irrelevant:     'rgba(226,232,240,0.18)',
 }
 const STATUS_LABEL: Record<LeadStatus, string> = {
-  interested: 'Interested', partially_paid: 'Partial',
-  paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
+  interested: 'Interested', email_sent: 'Email Sent',
+  partially_paid: 'Partial', paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
 }
-const ALL_STATUSES: LeadStatus[] = ['interested', 'partially_paid', 'paid', 'past', 'irrelevant']
+const ALL_STATUSES: LeadStatus[] = ['interested', 'email_sent', 'partially_paid', 'paid', 'past', 'irrelevant']
 
 interface EventSummary { slug: string; title_en: string }
 

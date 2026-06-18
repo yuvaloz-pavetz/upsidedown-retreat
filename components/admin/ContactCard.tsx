@@ -19,11 +19,11 @@ const FREEDIVING_LEVELS: { value: FreedivingLevel; label: string }[] = [
 ]
 
 const STATUS_COLOR: Record<LeadStatus, string> = {
-  interested: '#4A9BB8', partially_paid: '#D4A853', paid: '#5A9A6F',
+  interested: '#4A9BB8', email_sent: '#9B7FD4', partially_paid: '#D4A853', paid: '#5A9A6F',
   past: 'rgba(226,232,240,0.35)', irrelevant: 'rgba(226,232,240,0.18)',
 }
 const STATUS_LABEL: Record<LeadStatus, string> = {
-  interested: 'Interested', partially_paid: 'Partial',
+  interested: 'Interested', email_sent: 'Email Sent', partially_paid: 'Partial',
   paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
 }
 
