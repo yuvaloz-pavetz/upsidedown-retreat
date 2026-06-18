@@ -24,7 +24,7 @@ const copy = {
     firstName: 'First name',
     lastName: 'Last name',
     email: 'Email',
-    phone: 'Phone (optional)',
+    phone: 'Phone',
     submit: 'Submit Registration',
     submitting: 'Sending...',
     welcomeBack: (name: string) => `Welcome back, ${name}`,
@@ -40,7 +40,7 @@ const copy = {
     firstName: 'שם פרטי',
     lastName: 'שם משפחה',
     email: 'אימייל',
-    phone: 'טלפון (אופציונלי)',
+    phone: 'טלפון',
     submit: 'שלח הרשמה',
     submitting: 'שולח...',
     welcomeBack: (name: string) => `ברוך הבא, ${name}`,
@@ -86,6 +86,7 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [consent, setConsent] = useState(false)
+
   const [welcomeName, setWelcomeName] = useState<string | null>(null)
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'duplicate'>('idle')
 
@@ -105,7 +106,7 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!firstName || !lastName || !email || !consent) return
+    if (!firstName || !lastName || !email || !phone || !consent) return
     setFormStatus('loading')
     try {
       const res = await fetch('/api/register', {
@@ -138,6 +139,7 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
             event_source_url: window.location.href,
             email, phone: phone || undefined,
             first_name: firstName, last_name: lastName,
+            external_id: email,
             fbc, fbp,
             custom_data: { content_name: eventSlug },
           }),
@@ -262,6 +264,7 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder={t.phone}
+              required
               className="font-body"
               style={inputStyle}
               dir="ltr"
@@ -285,11 +288,11 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
 
           <motion.button
             type="submit"
-            disabled={formStatus === 'loading' || !consent}
-            whileHover={formStatus !== 'loading' && consent ? { scale: 1.01 } : {}}
-            whileTap={formStatus !== 'loading' && consent ? { scale: 0.98 } : {}}
+            disabled={formStatus === 'loading' || !consent || !phone}
+            whileHover={formStatus !== 'loading' && consent && !!phone ? { scale: 1.01 } : {}}
+            whileTap={formStatus !== 'loading' && consent && !!phone ? { scale: 0.98 } : {}}
             className="btn-solid-gold"
-            style={{ justifyContent: 'center', width: '100%', borderRadius: '4px', padding: '0.85rem 1.5rem', fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '0.25rem', cursor: consent ? 'pointer' : 'not-allowed', opacity: consent ? 1 : 0.5 }}
+            style={{ justifyContent: 'center', width: '100%', borderRadius: '4px', padding: '0.85rem 1.5rem', fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '0.25rem', cursor: consent && phone ? 'pointer' : 'not-allowed', opacity: consent && phone ? 1 : 0.5 }}
           >
             {formStatus === 'loading' ? t.submitting : t.submit}
           </motion.button>

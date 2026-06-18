@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     phone?: string
     first_name?: string
     last_name?: string
+    external_id?: string
     client_ip?: string
     client_user_agent?: string
     fbc?: string
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
   if (body.phone) userData.ph = hash(body.phone.replace(/\D/g, ''))
   if (body.first_name) userData.fn = hash(body.first_name)
   if (body.last_name) userData.ln = hash(body.last_name)
+  if (body.external_id) userData.external_id = hash(body.external_id)
 
   const testCode = process.env.META_CAPI_TEST_CODE
   const payload: Record<string, unknown> = {
