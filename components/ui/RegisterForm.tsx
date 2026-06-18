@@ -7,7 +7,7 @@ import Link from 'next/link'
 import type { Locale } from '@/lib/i18n'
 import type { PricingTier } from '@/lib/events'
 import { formatTierPrice } from '@/lib/events'
-import { trackEvent } from '@/components/analytics/MetaPixel'
+import { trackEvent, getFbc } from '@/components/analytics/MetaPixel'
 
 interface RegisterFormProps {
   eventSlug: string
@@ -127,8 +127,8 @@ export default function RegisterForm({ eventSlug, locale, defaultAmount = '', ti
       if (res.ok && json.ok) {
         const eventId = crypto.randomUUID()
         trackEvent('Lead', { content_name: eventSlug }, { eventID: eventId })
-        const fbc = document.cookie.match(/_fbc=([^;]*)/)?.[1]
-        const fbp = document.cookie.match(/_fbp=([^;]*)/)?.[1]
+        const fbc = getFbc()
+        const fbp = document.cookie.match(/(?:^|; )_fbp=([^;]*)/)?.[1]
         void fetch('/api/meta/event', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

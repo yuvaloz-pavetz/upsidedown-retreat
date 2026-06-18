@@ -18,9 +18,31 @@ function PageViewTracker() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (typeof window.fbq === 'function') {
-      window.fbq('track', 'PageView')
+    // Capture fbclid from URL and persist for later CAPI calls
+    const fbclid = searchParams.get('fbclid')
+    if (fbclid) {
+      const fbc = `fb.1.${Date.now()}.${fbclid}`
+      try { sessionStorage.setItem('_fbc', fbc) } catch { /* ignore */ }
     }
+
+    if (typeof window.fbq !== 'function') return
+    window.fbq('track', 'PageView')
+
+    // Mirror PageView to CAPI
+    const eventId = crypto.randomUUID()
+    window.fbq('track', 'PageView', {}, { eventID: eventId })
+    const fbc = getFbc()
+    const fbp = getCookie('_fbp')
+    void fetch('/api/meta/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_name: 'PageView',
+        event_id: eventId,
+        event_source_url: window.location.href,
+        fbc, fbp,
+      }),
+    })
   }, [pathname, searchParams])
 
   return null
@@ -56,6 +78,16 @@ export default function MetaPixel() {
       </Suspense>
     </>
   )
+}
+
+function getCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined
+  return document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`))?.[1]
+}
+
+export function getFbc(): string | undefined {
+  // Prefer browser cookie (set by Pixel JS), fall back to sessionStorage (captured from URL)
+  return getCookie('_fbc') ?? (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('_fbc') ?? undefined : undefined)
 }
 
 export function trackEvent(eventName: string, params?: Record<string, unknown>, options?: { eventID?: string }) {
