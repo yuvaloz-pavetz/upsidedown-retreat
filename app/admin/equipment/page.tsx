@@ -30,6 +30,7 @@ interface IntakeLead {
   shoe_size?: string | null; height?: number | null; weight?: number | null
   has_dive_gear?: boolean | null; gear_items?: string[] | null
   food_allergies?: string | null; medical_notes?: string | null; intake_submitted_at?: string | null
+  photo_consent?: boolean | null
 }
 
 function hasMedicalYes(notes: string | null | undefined) {
@@ -75,6 +76,8 @@ export default function EquipmentPage() {
   const gearTotals = new Map<string, number>(ALL_GEAR.map(g => [g, 0]))
   const foodNotes: string[] = []
   let medicalAlerts = 0
+  let photoYes = 0
+  let photoNo = 0
 
   for (const l of filtered) {
     const size = (l.shoe_size ?? '').trim()
@@ -84,7 +87,13 @@ export default function EquipmentPage() {
     for (const g of needed) gearTotals.set(g, (gearTotals.get(g) ?? 0) + 1)
     if (l.food_allergies?.trim()) foodNotes.push(`${l.first_name} ${l.last_name}: ${l.food_allergies.trim()}`)
     if (hasMedicalYes(l.medical_notes)) medicalAlerts++
+    if (l.intake_submitted_at) {
+      if (l.photo_consent === true) photoYes++
+      else if (l.photo_consent === false) photoNo++
+    }
   }
+
+  const photoNoNames = filtered.filter(l => l.intake_submitted_at && l.photo_consent === false)
 
   const sortedSizes = [...shoeSizes.entries()].sort((a, b) => {
     const na = parseFloat(a[0]), nb = parseFloat(b[0])
@@ -165,7 +174,35 @@ export default function EquipmentPage() {
                       <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'rgba(226,232,240,0.35)' }}>flagged conditions — check email</p>
                     </div>
                   )}
+
+                  <div style={card}>
+                    <p style={cardTitle}>Photo Consent</p>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
+                      <span style={{ color: '#5A9A6F' }}>{photoYes}</span>
+                      <span style={{ color: 'rgba(226,232,240,0.2)', fontWeight: 400, fontSize: '1rem' }}> yes / </span>
+                      <span style={{ color: photoNo > 0 ? '#f87171' : 'rgba(226,232,240,0.3)' }}>{photoNo}</span>
+                      <span style={{ color: 'rgba(226,232,240,0.2)', fontWeight: 400, fontSize: '1rem' }}> no</span>
+                    </p>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: 'rgba(226,232,240,0.35)' }}>from submitted intakes</p>
+                  </div>
                 </div>
+
+                {/* Photo consent — opted out */}
+                {photoNoNames.length > 0 && (
+                  <div style={{ ...card, marginBottom: '2rem', borderColor: 'rgba(248,113,113,0.3)', background: 'rgba(248,113,113,0.05)' }}>
+                    <p style={{ ...cardTitle, color: 'rgba(248,113,113,0.7)' }}>Did NOT Consent to Photos — Do Not Include</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {photoNoNames.map(l => (
+                        <span key={l.email} style={{
+                          fontSize: '0.8rem', color: '#f87171', background: 'rgba(248,113,113,0.1)',
+                          borderRadius: 5, padding: '0.3rem 0.7rem', fontWeight: 600,
+                        }}>
+                          {l.first_name} {l.last_name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Gear totals to procure */}
                 {needGear.size > 0 && (
@@ -224,7 +261,7 @@ export default function EquipmentPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 700 }}>
                     <thead>
                       <tr>
-                        {['Name', 'Height', 'Weight', 'Shoe (EU)', 'Own Gear', 'Needs Rental', 'Food Notes', '⚕'].map((h, i) => (
+                        {['Name', 'Height', 'Weight', 'Shoe (EU)', 'Own Gear', 'Needs Rental', 'Food Notes', '⚕', '📷'].map((h, i) => (
                           <th key={i} style={{ ...head, textAlign: 'left' }}>{h}</th>
                         ))}
                       </tr>
@@ -266,6 +303,17 @@ export default function EquipmentPage() {
                               {med
                                 ? <span title="Medical condition flagged" style={{ color: '#f87171' }}>⚠️</span>
                                 : <span style={{ color: 'rgba(226,232,240,0.15)' }}>—</span>}
+                            </td>
+                            <td style={cell}>
+                              {!l.intake_submitted_at ? (
+                                <span style={{ color: 'rgba(226,232,240,0.15)' }}>—</span>
+                              ) : l.photo_consent === true ? (
+                                <span title="Consented to photos" style={{ color: '#5A9A6F' }}>✓</span>
+                              ) : l.photo_consent === false ? (
+                                <span title="Did NOT consent to photos" style={{ color: '#f87171', fontWeight: 700 }}>✕</span>
+                              ) : (
+                                <span style={{ color: 'rgba(226,232,240,0.15)' }}>—</span>
+                              )}
                             </td>
                           </tr>
                         )

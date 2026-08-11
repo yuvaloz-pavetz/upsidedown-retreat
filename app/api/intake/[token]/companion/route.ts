@@ -23,7 +23,7 @@ function buildHtml(toName: string, fromName: string, url: string, he: boolean) {
     <p style="font-size:12px;color:#aaa">הקישור אישי עבורך. אפשר לחזור ולעדכן בכל עת.</p>
   </div>
   <div style="background:#f8f8f8;padding:18px 40px;text-align:center;border-top:1px solid #eee">
-    <p style="margin:0;font-size:12px;color:#bbb">UpsideDown Retreat &nbsp;·&nbsp; <a href="mailto:info@upsidedown-retreat.com" style="color:#D4A853;text-decoration:none">info@upsidedown-retreat.com</a></p>
+    <p style="margin:0;font-size:12px;color:#bbb">UpsideDown Retreat &nbsp;·&nbsp; <a href="mailto:hi@upsidedown-retreat.com" style="color:#D4A853;text-decoration:none">hi@upsidedown-retreat.com</a></p>
   </div>
 </div></body></html>`
     : `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head>
@@ -43,7 +43,7 @@ function buildHtml(toName: string, fromName: string, url: string, he: boolean) {
     <p style="font-size:12px;color:#aaa">This link is personal to you. You can return and update at any time.</p>
   </div>
   <div style="background:#f8f8f8;padding:18px 40px;text-align:center;border-top:1px solid #eee">
-    <p style="margin:0;font-size:12px;color:#bbb">UpsideDown Retreat &nbsp;·&nbsp; <a href="mailto:info@upsidedown-retreat.com" style="color:#D4A853;text-decoration:none">info@upsidedown-retreat.com</a></p>
+    <p style="margin:0;font-size:12px;color:#bbb">UpsideDown Retreat &nbsp;·&nbsp; <a href="mailto:hi@upsidedown-retreat.com" style="color:#D4A853;text-decoration:none">hi@upsidedown-retreat.com</a></p>
   </div>
 </div></body></html>`
 }
@@ -111,6 +111,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
         headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
         body: JSON.stringify({
           sender: { name: 'UpsideDown Retreat', email: senderEmail },
+          replyTo: { email: 'hi@upsidedown-retreat.com', name: 'UpsideDown Retreat' },
           to: [{ email: email.trim(), name: first_name.trim() }],
           subject: isHe ? 'מלאו את הפרטים שלכם לריטריט' : 'Please fill in your details for the retreat',
           htmlContent: buildHtml(first_name.trim(), payer.first_name, formUrl, isHe),
