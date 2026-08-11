@@ -9,12 +9,14 @@ import { createClient } from '@/lib/supabase/client'
 const navItems = [
   { href: '/admin/retreats', label: 'Events' },
   { href: '/admin/crm', label: 'CRM' },
+  { href: '/admin/equipment', label: 'Equipment' },
   { href: '/admin/budget', label: 'Budget' },
   { href: '/admin/customers', label: 'Waitlist' },
   { href: '/admin/team', label: 'Team' },
   { href: '/admin/content', label: 'Content' },
   { href: '/admin/seo', label: 'SEO' },
   { href: '/admin/users', label: 'Users' },
+  { href: '/admin/outreach', label: 'Outreach' },
 ]
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
