@@ -4,6 +4,8 @@ import { useState } from 'react'
 import PaymentsPanel from './PaymentsPanel'
 import type { Lead, LeadStatus, Payment, FreedivingLevel } from '@/lib/supabase/types'
 
+const PAID_STATUSES: LeadStatus[] = ['partially_paid', 'paid', 'past']
+
 const GEAR_OPTIONS = [
   { value: 'mask', label: 'Mask / מסיכה' },
   { value: 'snorkel', label: 'Snorkel / שנורקל' },
@@ -12,6 +14,24 @@ const GEAR_OPTIONS = [
   { value: 'weight_belt', label: 'Weight belt / חגורת משקולות' },
 ]
 
+const CONDITION_LABELS: Record<string, string> = {
+  asthma: 'Asthma or respiratory condition',
+  heart: 'Heart or cardiovascular condition',
+  epilepsy: 'Epilepsy, seizures, or history of loss of consciousness',
+  diabetes: 'Diabetes',
+  surgery: 'Recent surgery or significant injury',
+  pregnancy: 'Pregnancy',
+  anxiety: 'Anxiety, panic disorder, or other condition affecting participation',
+  other: 'Other medical condition(s)',
+}
+
+function parseMedical(notes: string | null | undefined) {
+  if (!notes) return null
+  try {
+    return JSON.parse(notes) as { conditions?: Record<string, boolean>; details?: string }
+  } catch { return null }
+}
+
 const FREEDIVING_LEVELS: { value: FreedivingLevel; label: string }[] = [
   { value: 'basic_course', label: 'Basic Course' },
   { value: 'advanced_course', label: 'Advanced Course' },
@@ -19,12 +39,13 @@ const FREEDIVING_LEVELS: { value: FreedivingLevel; label: string }[] = [
 ]
 
 const STATUS_COLOR: Record<LeadStatus, string> = {
-  interested: '#4A9BB8', email_sent: '#9B7FD4', partially_paid: '#D4A853', paid: '#5A9A6F',
+  interested: '#4A9BB8', email_sent: '#9B7FD4', whatsapp_sent: '#25D366',
+  partially_paid: '#D4A853', paid: '#5A9A6F',
   past: 'rgba(226,232,240,0.35)', irrelevant: 'rgba(226,232,240,0.18)',
 }
 const STATUS_LABEL: Record<LeadStatus, string> = {
-  interested: 'Interested', email_sent: 'Email Sent', partially_paid: 'Partial',
-  paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
+  interested: 'Interested', email_sent: 'Email Sent', whatsapp_sent: 'WhatsApp Sent',
+  partially_paid: 'Partial', paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
 }
 
 const inp: React.CSSProperties = {
@@ -175,6 +196,11 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
     ? new Date(submittedLead.intake_submitted_at).toLocaleDateString()
     : null
 
+  const medical = parseMedical(submittedLead?.medical_notes)
+  const flaggedConditions = medical
+    ? Object.entries(medical.conditions ?? {}).filter(([, v]) => v === true).map(([k]) => CONDITION_LABELS[k] ?? k)
+    : []
+
   return (
     <div
       onClick={onClose}
@@ -199,9 +225,20 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
           display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem',
         }}>
           <div>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#e2e8f0', margin: 0, marginBottom: '0.2rem' }}>
-              {primary.first_name} {primary.last_name}
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#e2e8f0', margin: 0 }}>
+                {primary.first_name} {primary.last_name}
+              </h2>
+              {intakeDate ? (
+                <span style={{ fontSize: '0.68rem', background: 'rgba(90,154,111,0.15)', color: '#5A9A6F', borderRadius: '4px', padding: '0.15rem 0.5rem', whiteSpace: 'nowrap' }}>
+                  ✓ Intake {intakeDate}
+                </span>
+              ) : leads.some(l => PAID_STATUSES.includes(l.status)) ? (
+                <span style={{ fontSize: '0.68rem', background: 'rgba(255,255,255,0.04)', color: 'rgba(226,232,240,0.3)', borderRadius: '4px', padding: '0.15rem 0.5rem', whiteSpace: 'nowrap' }}>
+                  ○ Intake pending
+                </span>
+              ) : null}
+            </div>
             <a href={`mailto:${primary.email}`} style={{ fontSize: '0.78rem', color: '#D4A853', textDecoration: 'none' }}>
               {primary.email}
             </a>
@@ -341,6 +378,42 @@ export default function ContactCard({ leads, onClose, onLeadChange, onPaymentsSa
               {intakeError && (
                 <div style={{ padding: '0.6rem 0.8rem', borderRadius: '5px', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', fontSize: '0.75rem', color: '#f87171', wordBreak: 'break-all' }}>
                   Error: {intakeError}
+                </div>
+              )}
+
+              {/* Medical & emergency (read-only, from waiver) */}
+              {submittedLead && (
+                <div style={{
+                  padding: '0.75rem 0.9rem', borderRadius: '6px',
+                  background: flaggedConditions.length > 0 ? 'rgba(248,113,113,0.07)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${flaggedConditions.length > 0 ? 'rgba(248,113,113,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                }}>
+                  <p style={{ ...fieldLabel, color: flaggedConditions.length > 0 ? 'rgba(248,113,113,0.8)' : fieldLabel.color, marginBottom: '0.6rem' }}>
+                    {flaggedConditions.length > 0 ? '⚠ Medical conditions flagged' : 'Medical declaration'}
+                  </p>
+
+                  {flaggedConditions.length > 0 ? (
+                    <ul style={{ margin: '0 0 0.6rem', paddingInlineStart: '1.2rem', fontSize: '0.8rem', color: '#f87171' }}>
+                      {flaggedConditions.map(c => <li key={c}>{c}</li>)}
+                    </ul>
+                  ) : (
+                    <p style={{ margin: '0 0 0.6rem', fontSize: '0.8rem', color: 'rgba(226,232,240,0.4)' }}>No conditions flagged.</p>
+                  )}
+
+                  {medical?.details?.trim() && (
+                    <p style={{ margin: '0 0 0.6rem', fontSize: '0.8rem', color: '#e2e8f0', whiteSpace: 'pre-wrap', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', padding: '0.5rem 0.65rem' }}>
+                      {medical.details}
+                    </p>
+                  )}
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem 1rem', fontSize: '0.78rem' }}>
+                    {submittedLead.dob && (
+                      <div><span style={{ color: 'rgba(226,232,240,0.35)' }}>DOB: </span><span style={{ color: '#e2e8f0' }}>{submittedLead.dob}</span></div>
+                    )}
+                    {submittedLead.emergency_contact_name && (
+                      <div><span style={{ color: 'rgba(226,232,240,0.35)' }}>Emergency: </span><span style={{ color: '#e2e8f0' }}>{submittedLead.emergency_contact_name}{submittedLead.emergency_contact_phone ? ` · ${submittedLead.emergency_contact_phone}` : ''}</span></div>
+                    )}
+                  </div>
                 </div>
               )}
 

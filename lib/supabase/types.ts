@@ -85,7 +85,7 @@ export interface WaitlistEntry {
   created_at: string
 }
 
-export type LeadStatus = 'interested' | 'email_sent' | 'partially_paid' | 'paid' | 'past' | 'irrelevant'
+export type LeadStatus = 'interested' | 'email_sent' | 'whatsapp_sent' | 'partially_paid' | 'paid' | 'past' | 'irrelevant'
 
 export type PaymentMethod = 'bank' | 'cash' | 'credit' | 'paypal' | 'other'
 
@@ -124,6 +124,14 @@ export interface Lead {
   has_dive_gear?: boolean | null
   gear_items?: string[] | null
   food_allergies?: string | null
+  medical_notes?: string | null
+  waiver_signed_at?: string | null
+  waiver_name?: string | null
+  waiver_signature?: string | null
+  dob?: string | null
+  emergency_contact_name?: string | null
+  emergency_contact_phone?: string | null
+  photo_consent?: boolean | null
   freediving_level?: FreedivingLevel | null
   intake_token?: string | null
   intake_submitted_at?: string | null

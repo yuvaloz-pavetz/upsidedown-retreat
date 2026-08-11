@@ -12,16 +12,17 @@ const CURRENCIES = ['ILS', 'EUR', 'USD']
 const STATUS_COLOR: Record<LeadStatus, string> = {
   interested:     '#4A9BB8',
   email_sent:     '#9B7FD4',
+  whatsapp_sent:  '#25D366',
   partially_paid: '#D4A853',
   paid:           '#5A9A6F',
   past:           'rgba(226,232,240,0.35)',
   irrelevant:     'rgba(226,232,240,0.18)',
 }
 const STATUS_LABEL: Record<LeadStatus, string> = {
-  interested: 'Interested', email_sent: 'Email Sent',
+  interested: 'Interested', email_sent: 'Email Sent', whatsapp_sent: 'WhatsApp Sent',
   partially_paid: 'Partial', paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
 }
-const ALL_STATUSES: LeadStatus[] = ['interested', 'email_sent', 'partially_paid', 'paid', 'past', 'irrelevant']
+const ALL_STATUSES: LeadStatus[] = ['interested', 'email_sent', 'whatsapp_sent', 'partially_paid', 'paid', 'past', 'irrelevant']
 
 interface EventSummary { slug: string; title_en: string }
 
@@ -140,6 +141,7 @@ export default function CRMPage() {
   const [view, setView] = useState<'events' | 'contacts'>('events')
   const [loading, setLoading] = useState(true)
   const [hiddenStatuses, setHiddenStatuses] = useState<Set<LeadStatus>>(new Set(['irrelevant']))
+  const [intakeFilter, setIntakeFilter] = useState<'all' | 'submitted' | 'pending'>('all')
   const [expandedLeadId, setExpandedLeadId] = useState<string | null>(null)
   const [selectedContactEmail, setSelectedContactEmail] = useState<string | null>(null)
   const [editingAmount, setEditingAmount] = useState<string | null>(null)
@@ -302,7 +304,14 @@ export default function CRMPage() {
   }
 
   const counts = ALL_STATUSES.reduce((acc, s) => { acc[s] = leads.filter(l => l.status === s).length; return acc }, {} as Record<LeadStatus, number>)
-  const visibleLeads = leads.filter(l => !hiddenStatuses.has(l.status))
+  const PAID_STATUSES: LeadStatus[] = ['partially_paid', 'paid', 'past']
+  const visibleLeads = leads
+    .filter(l => !hiddenStatuses.has(l.status))
+    .filter(l => {
+      if (intakeFilter === 'submitted') return !!l.intake_submitted_at
+      if (intakeFilter === 'pending') return !l.intake_submitted_at && PAID_STATUSES.includes(l.status)
+      return true
+    })
   const leadById = new Map(leads.map(l => [l.id, l]))
 
   if (loading) return <AdminShell><p style={{ color: 'rgba(226,232,240,0.3)', fontSize: '0.85rem' }}>Loading...</p></AdminShell>
@@ -442,6 +451,17 @@ export default function CRMPage() {
                       <span style={{ fontSize: '0.72rem', color: STATUS_COLOR[s], fontWeight: 600 }}>{counts[s]}</span>
                     </button>
                   ))}
+                  <span style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.08)', alignSelf: 'center' }} />
+                  {(['all', 'submitted', 'pending'] as const).map(f => (
+                    <button key={f} onClick={() => setIntakeFilter(f)} style={{
+                      padding: '0.4rem 0.85rem', background: intakeFilter === f ? '#0d1526' : 'transparent',
+                      borderRadius: '20px', cursor: 'pointer',
+                      border: `1px solid ${intakeFilter === f ? 'rgba(255,255,255,0.0)' : 'rgba(255,255,255,0.06)'}`,
+                      fontSize: '0.72rem', color: intakeFilter === f ? '#D4A853' : 'rgba(226,232,240,0.4)', transition: 'all 0.15s',
+                    }}>
+                      {f === 'all' ? 'All intake' : f === 'submitted' ? '✓ Intake done' : '○ Intake pending'}
+                    </button>
+                  ))}
                   <button onClick={exportCSV} style={{ marginLeft: 'auto', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', padding: '0.35rem 0.85rem', fontSize: '0.72rem', color: 'rgba(226,232,240,0.4)', cursor: 'pointer' }}>Export CSV</button>
                 </div>
               )}
@@ -487,6 +507,11 @@ export default function CRMPage() {
                                     <span style={{ fontSize: '0.58rem', color: '#5A9A6F', background: 'rgba(90,154,111,0.12)', borderRadius: 3, padding: '0.1rem 0.4rem', marginRight: '0.45rem', verticalAlign: 'middle' }}>↳ comp</span>
                                   )}
                                   {lead.first_name} {lead.last_name}
+                                  {lead.intake_submitted_at
+                                    ? <span title="Intake submitted" style={{ marginLeft: '0.35rem', fontSize: '0.6rem', color: '#5A9A6F' }}>✓</span>
+                                    : PAID_STATUSES.includes(lead.status)
+                                      ? <span title="Intake pending" style={{ marginLeft: '0.35rem', fontSize: '0.6rem', color: 'rgba(226,232,240,0.2)' }}>○</span>
+                                      : null}
                                   <span style={{ marginLeft: '0.35rem', fontSize: '0.6rem', color: 'rgba(212,168,83,0.45)' }}>›</span>
                                   {lead.companion_of && (() => { const p = leadById.get(lead.companion_of!); return p ? <span style={{ display: 'block', fontSize: '0.58rem', color: 'rgba(90,154,111,0.5)', marginTop: '0.1rem' }}>of {p.first_name} {p.last_name}</span> : null })()}
                                 </td>
@@ -691,6 +716,16 @@ export default function CRMPage() {
 
                               {/* Action buttons */}
                               <div style={{ padding: '0 1rem 0.9rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <button
+                                  onClick={e => { e.stopPropagation(); setSelectedContactEmail(lead.email) }}
+                                  style={{
+                                    flex: 1, textAlign: 'center', padding: '0.6rem', borderRadius: '6px',
+                                    background: 'rgba(212,168,83,0.08)', border: '1px solid rgba(212,168,83,0.2)',
+                                    color: '#D4A853', fontSize: '0.78rem', cursor: 'pointer',
+                                  }}
+                                >
+                                  Card
+                                </button>
                                 <a href={`mailto:${lead.email}`} onClick={e => e.stopPropagation()} style={{
                                   flex: 1, textAlign: 'center', padding: '0.6rem', borderRadius: '6px',
                                   background: 'rgba(212,168,83,0.08)', border: '1px solid rgba(212,168,83,0.2)',

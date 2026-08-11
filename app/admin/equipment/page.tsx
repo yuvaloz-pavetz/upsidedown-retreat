@@ -72,6 +72,7 @@ export default function EquipmentPage() {
   // Aggregations
   const shoeSizes = new Map<string, number>()
   const needGear = new Map<string, string[]>()
+  const gearTotals = new Map<string, number>(ALL_GEAR.map(g => [g, 0]))
   const foodNotes: string[] = []
   let medicalAlerts = 0
 
@@ -80,6 +81,7 @@ export default function EquipmentPage() {
     if (size) shoeSizes.set(size, (shoeSizes.get(size) ?? 0) + 1)
     const needed = gearNeeded(l)
     if (needed.length > 0) needGear.set(`${l.first_name} ${l.last_name}`, needed)
+    for (const g of needed) gearTotals.set(g, (gearTotals.get(g) ?? 0) + 1)
     if (l.food_allergies?.trim()) foodNotes.push(`${l.first_name} ${l.last_name}: ${l.food_allergies.trim()}`)
     if (hasMedicalYes(l.medical_notes)) medicalAlerts++
   }
@@ -164,6 +166,25 @@ export default function EquipmentPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Gear totals to procure */}
+                {needGear.size > 0 && (
+                  <div style={{ ...card, marginBottom: '2rem' }}>
+                    <p style={cardTitle}>Total to Bring / Rent</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                      {ALL_GEAR.filter(g => (gearTotals.get(g) ?? 0) > 0).map(g => (
+                        <div key={g} style={{
+                          display: 'flex', alignItems: 'baseline', gap: '0.4rem',
+                          background: 'rgba(212,168,83,0.1)', border: '1px solid rgba(212,168,83,0.2)',
+                          borderRadius: 6, padding: '0.4rem 0.8rem',
+                        }}>
+                          <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#D4A853' }}>{gearTotals.get(g)}</span>
+                          <span style={{ fontSize: '0.8rem', color: 'rgba(226,232,240,0.6)' }}>{GEAR_LABEL[g] ?? g}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Gear needs breakdown */}
                 {needGear.size > 0 && (
