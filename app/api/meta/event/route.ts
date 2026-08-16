@@ -30,7 +30,12 @@ export async function POST(req: NextRequest) {
     custom_data?: Record<string, unknown>
   }
 
-  const ip = body.client_ip ?? req.headers.get('x-forwarded-for')?.split(',')[0] ?? req.headers.get('x-real-ip') ?? undefined
+  const forwardedIps = (req.headers.get('x-forwarded-for') ?? '').split(',').map(s => s.trim()).filter(Boolean)
+  const ip = body.client_ip
+    ?? forwardedIps.find(s => s.includes(':'))  // prefer IPv6
+    ?? forwardedIps[0]
+    ?? req.headers.get('x-real-ip')
+    ?? undefined
   const ua = body.client_user_agent ?? req.headers.get('user-agent') ?? undefined
 
   const userData: Record<string, string | undefined> = {
@@ -60,7 +65,7 @@ export async function POST(req: NextRequest) {
   }
 
   const res = await fetch(
-    `https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${accessToken}`,
+    `https://graph.facebook.com/v21.0/${PIXEL_ID}/events?access_token=${accessToken}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

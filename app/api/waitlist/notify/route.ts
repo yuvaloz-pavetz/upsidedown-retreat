@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
         headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
         body: JSON.stringify({
           sender: { name: senderName, email: senderEmail },
+          replyTo: { email: 'hi@upsidedown-retreat.com', name: 'UpsideDown Retreat' },
           to: [{ email: entry.email, name: entry.name }],
           subject,
           htmlContent,

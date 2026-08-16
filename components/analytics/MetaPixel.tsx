@@ -25,24 +25,44 @@ function PageViewTracker() {
       try { sessionStorage.setItem('_fbc', fbc) } catch { /* ignore */ }
     }
 
-    if (typeof window.fbq !== 'function') return
-    window.fbq('track', 'PageView')
-
-    // Mirror PageView to CAPI
     const eventId = crypto.randomUUID()
-    window.fbq('track', 'PageView', {}, { eventID: eventId })
-    const fbc = getFbc()
-    const fbp = getCookie('_fbp')
-    void fetch('/api/meta/event', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event_name: 'PageView',
-        event_id: eventId,
-        event_source_url: window.location.href,
-        fbc, fbp,
-      }),
-    })
+    const url = window.location.href
+    let fired = false
+
+    const fire = () => {
+      if (fired) return
+      fired = true
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', 'PageView', {}, { eventID: eventId })
+      }
+      const fbc = getFbc()
+      const fbp = getCookie('_fbp')
+      void fetch('/api/meta/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_name: 'PageView', event_id: eventId, event_source_url: url, fbc, fbp }),
+      })
+    }
+
+    // afterInteractive script may not have run yet — poll until fbq is ready
+    const poll = setInterval(() => {
+      if (typeof window.fbq === 'function') {
+        clearInterval(poll)
+        // 300ms extra for fbevents.js to set _fbp cookie after init
+        setTimeout(fire, 300)
+      }
+    }, 50)
+
+    // Fallback: send CAPI even if fbq never loads (blocked by ad blocker etc.)
+    const fallback = setTimeout(() => {
+      clearInterval(poll)
+      fire()
+    }, 2000)
+
+    return () => {
+      clearInterval(poll)
+      clearTimeout(fallback)
+    }
   }, [pathname, searchParams])
 
   return null
@@ -61,7 +81,6 @@ export default function MetaPixel() {
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '${PIXEL_ID}');
-        fbq('track', 'PageView');
       `}</Script>
       <noscript>
         {/* eslint-disable-next-line @next/next/no-img-element */}
