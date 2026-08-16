@@ -49,6 +49,9 @@ export const metadata: Metadata = {
     description: 'Where the sky meets the deep.',
     images: [{ url: '/images/hero-bg.jpeg', width: 1200, height: 630 }],
   },
+  other: {
+    'facebook-domain-verification': 'q9f6s3saf0dnohttznbtmpjkh4uxj2',
+  },
 }
 
 export default async function LocaleLayout({
