@@ -5,8 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import FadeUp from '@/components/motion/FadeUp'
-import { business } from '@/lib/business'
 import type { Locale } from '@/lib/i18n'
+
+const SUPPORT_EMAIL = 'hi@upsidedown-retreat.com'
 
 interface NewsletterLandingProps {
   locale: Locale
@@ -31,7 +32,7 @@ const copy = {
     consentLink: 'Privacy Policy',
     consentSuffix: '.',
     success: "You're on the list. We'll write when there's something worth saying.",
-    error: `Something went wrong. Try again or email ${business.email}`,
+    error: `Something went wrong. Try again or email ${SUPPORT_EMAIL}`,
     imageAlt: 'A freediver rising toward the surface, light breaking through the water above',
   },
   he: {
@@ -52,7 +53,7 @@ const copy = {
     consentLink: 'מדיניות הפרטיות',
     consentSuffix: '.',
     success: 'אתם ברשימה. נכתוב כשיש משהו שווה לספר.',
-    error: `משהו השתבש. נסו שוב או כתבו ל ${business.email}`,
+    error: `משהו השתבש. נסו שוב או כתבו ל ${SUPPORT_EMAIL}`,
     imageAlt: 'צוללן חופשי עולה אל פני המים, אור חודר מלמעלה',
   },
 }
