@@ -18,7 +18,7 @@ const copy = {
     dir: 'ltr' as const,
     eyebrow: "Before It's Public",
     heading: 'Hear about it\nbefore anyone else.',
-    intro: "We run one retreat, maybe two, a year. 8–12 people each time. This list hears the dates first, along with honest notes and photos from the water between retreats.",
+    intro: "We keep it small and intentional, with a limited number of spots each time. This list hears the dates first, along with honest notes and photos from the water between retreats.",
     bullets: [
       'New dates and locations, before we post them anywhere else',
       'Real notes and photos from past groups, not marketing',
@@ -39,7 +39,7 @@ const copy = {
     dir: 'rtl' as const,
     eyebrow: 'לפני שזה יוצא לאוויר',
     heading: 'תשמעו על זה\nלפני כולם.',
-    intro: 'אנחנו מפעילים ריטריט אחד, אולי שניים בשנה. 8–12 אנשים בכל פעם. הרשימה הזו שומעת על התאריכים ראשונה, יחד עם רשמים ותמונות אמיתיים מהמים בין ריטריט לריטריט.',
+    intro: 'אנחנו שומרים על ריטריט קטן ומיוחד, עם מספר מקומות מוגבל בכל פעם. הרשימה הזו שומעת על התאריכים ראשונה, יחד עם רשמים ותמונות אמיתיים מהמים בין ריטריט לריטריט.',
     bullets: [
       'תאריכים ומיקומים חדשים, לפני שהם מתפרסמים בכל מקום אחר',
       'רשמים ותמונות אמיתיים מקבוצות קודמות, לא שיווק',
