@@ -36,6 +36,7 @@ export default function Nav({ locale }: NavProps) {
     { href: `/${locale}#experience`, label: t.experience },
     { href: `/${locale}/about`,       label: t.about, isPage: true },
     { href: `/${locale}/events`,     label: t.events, isPage: true },
+    { href: `/${locale}/newsletter`, label: t.newsletter, isPage: true },
   ]
 
   return (

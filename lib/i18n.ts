@@ -10,6 +10,7 @@ export const i18n = {
       experience: 'Experience',
       about: 'About',
       events: 'Events',
+      newsletter: 'Newsletter',
     },
     hero: {
       eyebrow: 'A Luxury Retreat',
@@ -208,6 +209,7 @@ export const i18n = {
       experience: 'החוויה',
       about: 'אודות',
       events: 'אירועים',
+      newsletter: 'ניוזלטר',
     },
     hero: {
       eyebrow: 'ריטריט יוקרתי',
@@ -400,7 +402,7 @@ export const i18n = {
 
 export type I18n = {
   dir: 'ltr' | 'rtl'
-  nav: { logo: string; book: string; concept: string; experience: string; about: string; events: string }
+  nav: { logo: string; book: string; concept: string; experience: string; about: string; events: string; newsletter: string }
   hero: {
     eyebrow: string
     words: [string, string, string]
