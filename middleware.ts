@@ -3,9 +3,36 @@ import { createServerClient } from '@supabase/ssr'
 
 const LOCALES = ['en', 'he'] as const
 const DEFAULT_LOCALE = 'en'
+const YEAR_SECONDS = 365 * 24 * 60 * 60
+
+/**
+ * Visitor country from the edge. Vercel sets `x-vercel-ip-country`; the local
+ * dev server does not, so we fall back to a `country` override cookie
+ * (set `country=IL` in devtools to test the Israeli experience locally).
+ */
+function detectCountry(request: NextRequest): string {
+  return (
+    request.headers.get('x-vercel-ip-country') ??
+    request.cookies.get('country')?.value ??
+    ''
+  ).toUpperCase()
+}
+
+/** Mirrors the detected country into a readable cookie for client components. */
+function withCountryCookie(response: NextResponse, country: string): NextResponse {
+  if (country) {
+    response.cookies.set('country', country, {
+      path: '/',
+      maxAge: YEAR_SECONDS,
+      sameSite: 'lax',
+    })
+  }
+  return response
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const country = detectCountry(request)
 
   // Skip API, static files, Next.js internals
   if (
@@ -79,22 +106,22 @@ export async function middleware(request: NextRequest) {
   const hasLocale = LOCALES.some(
     (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`)
   )
-  if (hasLocale) return NextResponse.next()
+  if (hasLocale) return withCountryCookie(NextResponse.next(), country)
 
-  // Determine locale from cookie, then Accept-Language, then default
+  // Determine locale: explicit choice first, then geo. Hebrew is offered to
+  // Israeli visitors only — everyone else lands on English.
   const cookieLocale = request.cookies.get('locale')?.value
   let locale: string = DEFAULT_LOCALE
 
   if (cookieLocale && (LOCALES as readonly string[]).includes(cookieLocale)) {
     locale = cookieLocale
-  } else {
-    const acceptLang = request.headers.get('accept-language') ?? ''
-    if (acceptLang.toLowerCase().includes('he')) locale = 'he'
+  } else if (country === 'IL') {
+    locale = 'he'
   }
 
   const url = request.nextUrl.clone()
   url.pathname = `/${locale}${pathname === '/' ? '' : pathname}`
-  return NextResponse.redirect(url)
+  return withCountryCookie(NextResponse.redirect(url), country)
 }
 
 export const config = {

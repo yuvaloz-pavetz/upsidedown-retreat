@@ -2,7 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { useRouter, usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import type { Locale } from '@/lib/i18n'
+import { readCountry, ISRAEL } from '@/lib/geo'
 
 interface LanguageSwitcherProps {
   currentLocale: Locale
@@ -11,6 +13,15 @@ interface LanguageSwitcherProps {
 export default function LanguageSwitcher({ currentLocale }: LanguageSwitcherProps) {
   const router = useRouter()
   const pathname = usePathname()
+
+  // Hebrew is offered to Israeli visitors only. Visitors already on /he keep the
+  // control so a direct Hebrew link is never a one-way door.
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    setVisible(currentLocale === 'he' || readCountry() === ISRAEL)
+  }, [currentLocale])
+
+  if (!visible) return null
 
   function switchLocale(next: Locale) {
     if (next === currentLocale) return

@@ -3,11 +3,17 @@
 import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import type { Locale } from '@/lib/i18n'
+import { readCountry } from '@/lib/geo'
 
 interface LocaleDetectorProps {
   currentLocale: Locale
 }
 
+/**
+ * Persists the visitor's locale on first visit. The choice itself is made in
+ * middleware from the edge country header (IL → Hebrew, everyone else English);
+ * this corrects the locale when a page was served before that ran.
+ */
 export default function LocaleDetector({ currentLocale }: LocaleDetectorProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -17,10 +23,7 @@ export default function LocaleDetector({ currentLocale }: LocaleDetectorProps) {
     const hasCookie = document.cookie.split(';').some((c) => c.trim().startsWith('locale='))
     if (hasCookie) return
 
-    // Detect from timezone — most reliable for Israel detection
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const detectedLocale: Locale =
-      tz === 'Asia/Jerusalem' || tz === 'Asia/Tel_Aviv' ? 'he' : 'en'
+    const detectedLocale: Locale = readCountry() === 'IL' ? 'he' : 'en'
 
     // Persist detection for 1 year
     const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString()
