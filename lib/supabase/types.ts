@@ -162,5 +162,6 @@ export interface BudgetItem {
   currency: string
   ils_amount: number | null
   notes: string
+  personal_for: string | null
   created_at: string
 }

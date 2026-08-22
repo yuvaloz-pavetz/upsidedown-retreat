@@ -11,6 +11,7 @@ type EditState = { id: string; field: 'description' | 'amount' | 'notes'; value:
 type Rates = Record<string, number> // ILS per 1 unit of foreign currency
 
 const CURRENCIES = ['ILS', 'EUR', 'USD']
+const PARTNERS = ['Gil', 'Yuval']
 
 const cell: React.CSSProperties = {
   padding: '0.6rem 0.85rem', fontSize: '0.82rem',
@@ -156,6 +157,56 @@ function SummaryCards({ manualIncome, manualExpenses, crmTotal, rates }: {
   )
 }
 
+// ── Profit split (personal draws deducted per partner) ────────────────────────
+
+function SplitCards({ incomeItems, expenseItems, crmTotal, rates }: {
+  incomeItems: BudgetItem[]
+  expenseItems: BudgetItem[]
+  crmTotal: number
+  rates: Rates
+}) {
+  const income = incomeItems.reduce((s, i) => s + effectiveILS(i, rates), 0) + crmTotal
+  const personalByPartner: Record<string, number> = {}
+  let businessExpenses = 0
+  for (const item of expenseItems) {
+    const ils = effectiveILS(item, rates)
+    if (item.personal_for) personalByPartner[item.personal_for] = (personalByPartner[item.personal_for] ?? 0) + ils
+    else businessExpenses += ils
+  }
+  const hasPersonal = Object.values(personalByPartner).some(v => v > 0)
+  if (!hasPersonal) return null
+
+  const pool = income - businessExpenses
+  const half = pool / 2
+
+  const card = (label: string, value: number, color: string, sub?: string) => (
+    <div style={{ background: '#0d1526', borderRadius: 8, padding: '1.25rem 1.5rem', flex: 1, minWidth: 140 }}>
+      <p style={{ fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(226,232,240,0.3)', marginBottom: '0.5rem' }}>{label}</p>
+      <p style={{ fontSize: '1.4rem', fontWeight: 300, color, lineHeight: 1 }}>{(value < 0 ? '−' : '') + formatILS(Math.abs(value))}</p>
+      {sub && <p style={{ fontSize: '0.68rem', color: 'rgba(226,232,240,0.3)', marginTop: '0.35rem' }}>{sub}</p>}
+    </div>
+  )
+
+  return (
+    <div style={{ marginTop: '1rem' }}>
+      <p style={{ fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(226,232,240,0.28)', marginBottom: '0.6rem' }}>
+        Profit split · 50/50 after personal draws
+      </p>
+      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        {card('Split pool', pool, '#D4A853', 'Income − shared expenses')}
+        {PARTNERS.map(p => {
+          const personal = personalByPartner[p] ?? 0
+          const payout = half - personal
+          return card(
+            `${p}'s payout`, payout, payout >= 0 ? '#5A9A6F' : '#f87171',
+            personal > 0 ? `Half ${formatILS(half)} − ${formatILS(personal)} personal` : `Half ${formatILS(half)}`
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── Budget section ────────────────────────────────────────────────────────────
 
 interface SectionProps {
@@ -177,6 +228,7 @@ function BudgetSection({ type, items, slug, rates, onAdd, onUpdate, onRemove }: 
   const [amount, setAmount]   = useState('')
   const [currency, setCurrency] = useState('ILS')
   const [notes, setNotes]     = useState('')
+  const [personalFor, setPersonalFor] = useState('')
   const [saving, setSaving]   = useState(false)
   const [addErr, setAddErr]   = useState('')
   const [editing, setEditing] = useState<EditState>(null)
@@ -193,11 +245,18 @@ function BudgetSection({ type, items, slug, rates, onAdd, onUpdate, onRemove }: 
     const ils_amount = toILS(val, currency, rates)
     const { data, error } = await supabase
       .from('budget_items')
-      .insert({ event_slug: slug, type, description: desc.trim(), amount: val, currency, notes: notes.trim(), ils_amount })
+      .insert({ event_slug: slug, type, description: desc.trim(), amount: val, currency, notes: notes.trim(), ils_amount, personal_for: type === 'expense' ? (personalFor || null) : null })
       .select().single()
     setSaving(false)
     if (error) { setAddErr(error.message); return }
-    if (data) { onAdd(data as BudgetItem); setDesc(''); setAmount(''); setNotes('') }
+    if (data) { onAdd(data as BudgetItem); setDesc(''); setAmount(''); setNotes(''); setPersonalFor('') }
+  }
+
+  async function updatePersonalFor(id: string, partner: string) {
+    const item = items.find(i => i.id === id)!
+    const personal_for = partner || null
+    onUpdate({ ...item, personal_for })
+    await supabase.from('budget_items').update({ personal_for }).eq('id', id)
   }
 
   async function remove(id: string) {
@@ -237,14 +296,14 @@ function BudgetSection({ type, items, slug, rates, onAdd, onUpdate, onRemove }: 
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '420px' }}>
           <thead>
             <tr>
-              {['Description', 'Original', 'ILS', 'Notes', ''].map(h => (
+              {(type === 'expense' ? ['Description', 'Original', 'ILS', 'For', 'Notes', ''] : ['Description', 'Original', 'ILS', 'Notes', '']).map(h => (
                 <th key={h} style={{ ...head, textAlign: 'left' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {items.length === 0 && (
-              <tr><td colSpan={5} style={{ ...cell, color: 'rgba(226,232,240,0.2)', textAlign: 'center', padding: '1.5rem' }}>No items yet</td></tr>
+              <tr><td colSpan={type === 'expense' ? 6 : 5} style={{ ...cell, color: 'rgba(226,232,240,0.2)', textAlign: 'center', padding: '1.5rem' }}>No items yet</td></tr>
             )}
             {items.map(item => {
               const isEditDesc = editing?.id === item.id && editing.field === 'description'
@@ -269,6 +328,14 @@ function BudgetSection({ type, items, slug, rates, onAdd, onUpdate, onRemove }: 
                     </div>
                   </td>
                   <td style={{ ...cell, color, fontWeight: 600, whiteSpace: 'nowrap' }}>{formatILS(ils)}</td>
+                  {type === 'expense' && (
+                    <td style={cell}>
+                      <select value={item.personal_for ?? ''} onChange={e => updatePersonalFor(item.id, e.target.value)} style={{ ...inp, padding: '0.25rem 0.4rem', fontSize: '0.72rem', cursor: 'pointer', color: item.personal_for ? '#D4A853' : 'rgba(226,232,240,0.35)' }}>
+                        <option value="">Shared</option>
+                        {PARTNERS.map(p => <option key={p} value={p}>{p}</option>)}
+                      </select>
+                    </td>
+                  )}
                   <td style={{ ...cell, color: 'rgba(226,232,240,0.35)', fontSize: '0.75rem' }}>
                     {isEditNote
                       ? <input autoFocus value={editing!.value} onChange={e => setEditing({ ...editing!, value: e.target.value })} onBlur={saveEdit} onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditing(null) }} style={editInp} />
@@ -292,6 +359,12 @@ function BudgetSection({ type, items, slug, rates, onAdd, onUpdate, onRemove }: 
         </select>
         {ilsPreview !== null && (
           <span style={{ fontSize: '0.75rem', color: 'rgba(226,232,240,0.35)', whiteSpace: 'nowrap' }}>≈ {formatILS(ilsPreview)}</span>
+        )}
+        {type === 'expense' && (
+          <select value={personalFor} onChange={e => setPersonalFor(e.target.value)} style={{ ...inp, cursor: 'pointer' }}>
+            <option value="">Shared</option>
+            {PARTNERS.map(p => <option key={p} value={p}>Personal — {p}</option>)}
+          </select>
         )}
         <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Note (optional)" style={{ ...inp, flex: '1 1 120px', minWidth: 0 }} onKeyDown={e => e.key === 'Enter' && add()} />
         <button onClick={add} disabled={saving} style={{ background: '#D4A853', border: 'none', borderRadius: 4, padding: '0.45rem 1rem', fontSize: '0.72rem', fontWeight: 600, color: '#0d1520', cursor: 'pointer', whiteSpace: 'nowrap' }}>
@@ -342,10 +415,10 @@ export default function BudgetPage() {
 
   function exportCSV() {
     if (!items.length || !selected) return
-    const header = 'Type,Description,Amount,Currency,ILS,Notes,Date'
+    const header = 'Type,Description,Amount,Currency,ILS,Personal,Notes,Date'
     const rows = items.map(i => [
       i.type, i.description, i.amount, i.currency,
-      effectiveILS(i, rates), i.notes,
+      effectiveILS(i, rates), i.personal_for ?? '', i.notes,
       new Date(i.created_at).toLocaleDateString(),
     ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
     const csv = [header, ...rows].join('\n')
@@ -406,6 +479,7 @@ export default function BudgetPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div>
               <SummaryCards manualIncome={incomeItems} manualExpenses={expenseItems} crmTotal={crmTotal} rates={rates} />
+              <SplitCards incomeItems={incomeItems} expenseItems={expenseItems} crmTotal={crmTotal} rates={rates} />
               {rateDate && (
                 <p style={{ fontSize: '0.65rem', color: 'rgba(226,232,240,0.2)', marginTop: '0.5rem', letterSpacing: '0.03em' }}>
                   {rateDate === 'fallback' ? 'Fallback rates · ' : `Rate ${rateDate} · `}
