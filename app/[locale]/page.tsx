@@ -13,6 +13,7 @@ import WhyDifferent from '@/components/sections/WhyDifferent'
 import Instructors from '@/components/sections/Instructors'
 import WhoFor from '@/components/sections/WhoFor'
 import UpcomingRetreat from '@/components/sections/UpcomingRetreat'
+import SoldOutPopup from '@/components/ui/SoldOutPopup'
 import Gallery from '@/components/sections/Gallery'
 import Testimonials from '@/components/sections/Testimonials'
 import Newsletter from '@/components/sections/Newsletter'
@@ -55,7 +56,7 @@ export default async function Home({
 
   const [contentMap, rawRetreats] = await Promise.all([
     getSiteContentMap(loc),
-    getOpenRetreats().catch(() => staticEvents.filter(e => e.status === 'open' || e.status === 'coming-soon' || e.status === 'last-spots')),
+    getOpenRetreats().catch(() => staticEvents.filter(e => e.status === 'open' || e.status === 'coming-soon' || e.status === 'last-spots' || e.status === 'sold-out')),
   ])
 
   const paidBySlug: Record<string, number> = {}
@@ -72,6 +73,7 @@ export default async function Home({
   const openRetreats = enrichEarlyBird(rawRetreats, paidBySlug)
 
   const content = buildI18n(loc, contentMap)
+  const soldOutRetreat = openRetreats.find(e => e.status === 'sold-out')
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -88,6 +90,7 @@ export default async function Home({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {soldOutRetreat && <SoldOutPopup retreat={soldOutRetreat} locale={loc} />}
       <Nav locale={loc} />
       <Hero locale={loc} t={content.hero} />
       <CoreIdea locale={loc} />

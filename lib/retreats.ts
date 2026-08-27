@@ -99,7 +99,7 @@ export async function getOpenRetreats(): Promise<Event[]> {
   const { data, error } = await supabase
     .from('retreats')
     .select('*')
-    .in('status', ['open', 'coming-soon', 'last-spots'])
+    .in('status', ['open', 'coming-soon', 'last-spots', 'sold-out'])
     .order('sort_order', { ascending: true })
 
   if (error || !data) return []

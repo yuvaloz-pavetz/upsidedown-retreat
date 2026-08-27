@@ -9,7 +9,9 @@ import { i18n } from '@/lib/i18n'
 import type { Event, PricingTier } from '@/lib/events'
 import { formatTierPrice } from '@/lib/events'
 import WaitlistForm from '@/components/ui/WaitlistForm'
+import NewsletterInline from '@/components/ui/NewsletterInline'
 import RegisterForm from '@/components/ui/RegisterForm'
+import SoldOutPopup from '@/components/ui/SoldOutPopup'
 
 interface EventDetailContentProps {
   locale: Locale
@@ -185,7 +187,12 @@ function BookingDetails({
       </div>
       <div>
         {isSoldOut ? (
-          <WaitlistForm retreatSlug={event.slug} locale={locale} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <WaitlistForm retreatSlug={event.slug} locale={locale} />
+            <div style={{ borderTop: '1px solid rgba(232,213,183,0.1)', paddingTop: '1.5rem' }}>
+              <NewsletterInline locale={locale} heading={isHe ? 'או היו הראשונים לדעת על הריטריטים הבאים' : 'Or be first to know about our next retreats'} />
+            </div>
+          </div>
         ) : (
           <>
             <motion.button
@@ -686,6 +693,9 @@ export default function EventDetailContent({ locale, event, t }: EventDetailCont
         )}
       </AnimatePresence>
 
+      {/* Sold-out popup */}
+      {isSoldOut && <SoldOutPopup retreat={event} locale={locale} />}
+
       {/* Bottom CTA */}
       <section style={{ background: '#060e17', borderTop: '1px solid rgba(232,213,183,0.05)' }}>
         <div className="section-container" style={{ paddingTop: '6rem', paddingBottom: '6rem', textAlign: 'center' }}>
@@ -773,7 +783,12 @@ export default function EventDetailContent({ locale, event, t }: EventDetailCont
                 </div>
               )}
               {isSoldOut ? (
-                <WaitlistForm retreatSlug={event.slug} locale={locale} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <WaitlistForm retreatSlug={event.slug} locale={locale} />
+                  <div style={{ borderTop: '1px solid rgba(232,213,183,0.1)', paddingTop: '1.5rem' }}>
+                    <NewsletterInline locale={locale} heading={isHe ? 'או היו הראשונים לדעת על הריטריטים הבאים' : 'Or be first to know about our next retreats'} />
+                  </div>
+                </div>
               ) : (
                 <>
                   <motion.button

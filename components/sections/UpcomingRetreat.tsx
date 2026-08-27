@@ -23,16 +23,19 @@ function RetreatCard({ event, locale, index }: { event: Event; locale: Locale; i
     event.status === 'open' ? (locale === 'he' ? 'פתוח להרשמה' : 'Open') :
     event.status === 'last-spots' ? t.lastSpots :
     event.status === 'coming-soon' ? t.comingSoon :
+    event.status === 'sold-out' ? t.soldOut :
     t.soldOut
 
   const statusBg =
     event.status === 'last-spots' ? '#E3B23C' :
     event.status === 'coming-soon' ? 'rgba(26,26,46,0.8)' :
+    event.status === 'sold-out' ? 'rgba(181,82,26,0.9)' :
     '#E3B23C'
 
   const statusColor =
     event.status === 'last-spots' ? '#0B1D2A' :
     event.status === 'coming-soon' ? '#F7F8F6' :
+    event.status === 'sold-out' ? '#F7F8F6' :
     '#0B1D2A'
 
   return (
