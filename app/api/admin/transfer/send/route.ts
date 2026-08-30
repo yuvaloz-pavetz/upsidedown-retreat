@@ -23,8 +23,8 @@ function scheduleLine(eventSlug: string, locale: string): string {
   const arrival = formatTransferDateTime(schedule.arrivalDateTime, locale)
   const departure = formatTransferDateTime(schedule.departureDateTime, locale)
   return locale === 'he'
-    ? `הסעה קבועה מ/אל ${schedule.airport} — איסוף: ${arrival} · הורדה: ${departure}`
-    : `Fixed transfer at ${schedule.airport} — pickup: ${arrival} · drop-off: ${departure}`
+    ? `איסוף — ${schedule.airport} ← החווה — ${arrival} (המיקום המדויק יישלח בקבוצת הוואטסאפ). הורדה — החווה ← ${schedule.airport} — ${departure}`
+    : `Pickup — ${schedule.airport} → the farm — ${arrival} (exact meeting point shared in the WhatsApp group). Drop-off — the farm → ${schedule.airport} — ${departure}`
 }
 
 function emailEn(firstName: string, url: string, kind: Kind, eventSlug: string) {

@@ -135,9 +135,10 @@ export default function TransferPage() {
 
             {schedule && (
               <div style={{ marginBottom: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: '0.9rem 1rem' }}>
-                <p style={{ margin: '0 0 0.5rem', fontSize: '0.78rem', fontWeight: 700, color: '#374151' }}>{t.scheduleTitle} — {schedule.airport}</p>
-                <p style={{ margin: '0 0 0.2rem', fontSize: '0.8rem', color: '#6b7280' }}>{t.arrivalScheduleLabel}: {formatTransferDateTime(schedule.arrivalDateTime, person?.locale ?? 'en')}</p>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>{t.departureScheduleLabel}: {formatTransferDateTime(schedule.departureDateTime, person?.locale ?? 'en')}</p>
+                <p style={{ margin: '0 0 0.6rem', fontSize: '0.78rem', fontWeight: 700, color: '#374151' }}>{t.scheduleTitle}</p>
+                <p style={{ margin: '0 0 0.2rem', fontSize: '0.8rem', color: '#6b7280' }}>{t.arrivalScheduleLabel} — {formatTransferDateTime(schedule.arrivalDateTime, person?.locale ?? 'en')}</p>
+                <p style={{ margin: '0 0 0.5rem', fontSize: '0.72rem', color: '#9ca3af' }}>{t.whatsappNote}</p>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>{t.departureScheduleLabel} — {formatTransferDateTime(schedule.departureDateTime, person?.locale ?? 'en')}</p>
               </div>
             )}
 

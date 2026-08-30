@@ -19,9 +19,13 @@ export function getTransferSchedule(eventSlug: string): TransferSchedule | null 
   return TRANSFER_SCHEDULE[eventSlug] ?? null
 }
 
+// Times are always shown in the venue's local time (Crete/Athens), regardless
+// of the server's own timezone — without an explicit timeZone, Vercel's UTC
+// runtime would render 12:00+03:00 as 09:00.
 export function formatTransferDateTime(iso: string, locale: string): string {
   return new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
     weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    timeZone: 'Europe/Athens',
   }).format(new Date(iso))
 }
 
