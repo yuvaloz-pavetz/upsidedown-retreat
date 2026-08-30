@@ -136,10 +136,56 @@ export interface Lead {
   intake_token?: string | null
   intake_submitted_at?: string | null
   companion_of?: string | null
+  // T-shirt fields
+  person_type?: PersonType
+  shirt_size?: string | null
+  shirt_cut?: string | null
+  shirt_fit?: string | null
+  shirt_submitted_at?: string | null
+  shirt_source?: ShirtSource | null
+  // Airport transfer fields
+  transfer_arrival?: boolean | null
+  transfer_departure?: boolean | null
+  transfer_large_luggage?: boolean | null
+  transfer_flight_info?: string | null
+  transfer_submitted_at?: string | null
+  transfer_source?: TransferSource | null
 }
+
+export type PersonType = 'participant' | 'staff'
+export type ShirtSource = 'participant' | 'admin'
+export type TransferSource = 'participant' | 'admin'
 
 export type LeadInsert = Omit<Lead, 'id' | 'created_at' | 'updated_at'>
 export type LeadUpdate = Partial<LeadInsert>
+
+export type TshirtEmailKind = 'initial' | 'reminder' | 'test'
+export type TshirtEmailStatus = 'sent' | 'failed'
+
+export interface TshirtEmailLog {
+  id: string
+  lead_id: string | null
+  email: string
+  kind: TshirtEmailKind
+  status: TshirtEmailStatus
+  error: string | null
+  sent_by: string | null
+  created_at: string
+}
+
+export type TransferEmailKind = 'initial' | 'reminder' | 'test'
+export type TransferEmailStatus = 'sent' | 'failed'
+
+export interface TransferEmailLog {
+  id: string
+  lead_id: string | null
+  email: string
+  kind: TransferEmailKind
+  status: TransferEmailStatus
+  error: string | null
+  sent_by: string | null
+  created_at: string
+}
 
 export type UserRole = 'admin' | 'member'
 

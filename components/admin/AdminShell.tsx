@@ -10,6 +10,8 @@ const navItems = [
   { href: '/admin/retreats', label: 'Events' },
   { href: '/admin/crm', label: 'CRM' },
   { href: '/admin/equipment', label: 'Equipment' },
+  { href: '/admin/tshirt', label: 'T-Shirts' },
+  { href: '/admin/transfers', label: 'Transfers' },
   { href: '/admin/budget', label: 'Budget' },
   { href: '/admin/customers', label: 'Waitlist' },
   { href: '/admin/team', label: 'Team' },

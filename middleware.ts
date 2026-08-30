@@ -40,6 +40,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/images') ||
     pathname.startsWith('/intake') ||
+    pathname.startsWith('/tshirt') ||
+    pathname.startsWith('/transfer') ||
     /\.(.+)$/.test(pathname)
   ) {
     return NextResponse.next()
