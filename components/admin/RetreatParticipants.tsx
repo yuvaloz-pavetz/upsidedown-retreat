@@ -17,6 +17,11 @@ const STATUS_LABEL: Record<LeadStatus, string> = {
   interested: 'Interested', email_sent: 'Email Sent', whatsapp_sent: 'WhatsApp Sent',
   partially_paid: 'Partial', paid: 'Paid', past: 'Past', irrelevant: 'Irrelevant',
 }
+const ALL_STATUSES: LeadStatus[] = ['interested', 'email_sent', 'whatsapp_sent', 'partially_paid', 'paid', 'past', 'irrelevant']
+// "Registered" = actually committed to a spot — mirrors ELIGIBLE_LEAD_STATUSES
+// used for Equipment/T-Shirts/Transfers. Everything else starts hidden; the
+// filter bar lets the admin bring any status back into view, same as CRM.
+const REGISTERED_STATUSES: LeadStatus[] = ['partially_paid', 'paid', 'past']
 
 // wa.me needs digits only, no leading zero. Local numbers here are entered
 // Israeli-style (leading 0) — swap it for the country code; anything already
@@ -32,6 +37,9 @@ export default function RetreatParticipants({ slug }: { slug: string }) {
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedContactEmail, setSelectedContactEmail] = useState<string | null>(null)
+  const [hiddenStatuses, setHiddenStatuses] = useState<Set<LeadStatus>>(
+    () => new Set(ALL_STATUSES.filter(s => !REGISTERED_STATUSES.includes(s)))
+  )
 
   useEffect(() => {
     void fetch(`/api/admin/leads?slug=${encodeURIComponent(slug)}`)
@@ -53,13 +61,42 @@ export default function RetreatParticipants({ slug }: { slug: string }) {
     }))
   }
 
+  function toggleStatusFilter(s: LeadStatus) {
+    setHiddenStatuses(prev => {
+      const next = new Set(prev)
+      if (next.has(s)) next.delete(s); else next.add(s)
+      return next
+    })
+  }
+
   if (loading) return <p style={{ color: 'rgba(226,232,240,0.3)', fontSize: '0.85rem' }}>Loading...</p>
   if (leads.length === 0) return <p style={{ color: 'rgba(226,232,240,0.3)', fontSize: '0.85rem' }}>No registrations yet.</p>
 
+  const counts = ALL_STATUSES.reduce((acc, s) => { acc[s] = leads.filter(l => l.status === s).length; return acc }, {} as Record<LeadStatus, number>)
+  const visibleLeads = leads.filter(l => !hiddenStatuses.has(l.status))
+
   return (
     <>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        {ALL_STATUSES.map(s => counts[s] > 0 && (
+          <button key={s} onClick={() => toggleStatusFilter(s)} style={{
+            padding: '0.4rem 0.85rem', background: hiddenStatuses.has(s) ? 'transparent' : '#0d1526',
+            borderRadius: '20px', display: 'flex', gap: '0.4rem', alignItems: 'center', cursor: 'pointer',
+            border: `1px solid ${hiddenStatuses.has(s) ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.0)'}`,
+            opacity: hiddenStatuses.has(s) ? 0.45 : 1, transition: 'all 0.15s',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: STATUS_COLOR[s], flexShrink: 0 }} />
+            <span style={{ fontSize: '0.72rem', color: 'rgba(226,232,240,0.5)' }}>{STATUS_LABEL[s]}</span>
+            <span style={{ fontSize: '0.72rem', color: STATUS_COLOR[s], fontWeight: 600 }}>{counts[s]}</span>
+          </button>
+        ))}
+      </div>
+
+      {visibleLeads.length === 0 ? (
+        <p style={{ color: 'rgba(226,232,240,0.3)', fontSize: '0.85rem' }}>No one matches the current filter.</p>
+      ) : (
       <div style={{ background: '#0d1526', borderRadius: '8px', overflow: 'hidden' }}>
-        {leads.map(lead => {
+        {visibleLeads.map(lead => {
           const wa = whatsappHref(lead.phone)
           return (
             <div
@@ -109,6 +146,7 @@ export default function RetreatParticipants({ slug }: { slug: string }) {
           )
         })}
       </div>
+      )}
 
       {selectedContactEmail && leads.filter(l => l.email === selectedContactEmail).length > 0 && (
         <ContactCard
