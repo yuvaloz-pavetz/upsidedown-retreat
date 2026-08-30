@@ -208,7 +208,7 @@ export default function TransfersAdminPage() {
         <div style={{ marginBottom: '1.75rem' }}>
           <h1 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 700, color: '#e2e8f0' }}>Airport Transfer</h1>
           <p style={{ margin: '4px 0 0', color: 'rgba(226,232,240,0.35)', fontSize: '0.82rem' }}>
-            {schedule ? `${schedule.airport} · pickup ${formatTransferDateTime(schedule.arrivalDateTime, 'en')} · drop-off ${formatTransferDateTime(schedule.departureDateTime, 'en')}` : 'No fixed schedule configured for this event — add one in lib/transfer-config.ts.'}
+            {schedule ? `${schedule.airport.en} · arrival ${formatTransferDateTime(schedule.arrivalDateTime, 'en')} · departure ${formatTransferDateTime(schedule.departureDateTime, 'en')}` : 'No fixed schedule configured for this event — add one in lib/transfer-config.ts.'}
           </p>
         </div>
 

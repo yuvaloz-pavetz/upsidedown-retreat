@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { tx } from './tx'
-import { getTransferSchedule, formatTransferDateTime } from '@/lib/transfer-config'
+import { getTransferSchedule, formatTransferLegLine, arrivalRouteLabel, departureRouteLabel } from '@/lib/transfer-config'
 
 const lbl: React.CSSProperties = { display: 'block', fontWeight: 600, marginBottom: 8, fontSize: '0.88rem', color: '#374151' }
 const sec: React.CSSProperties = { fontSize: '1rem', fontWeight: 700, color: '#1a2a3a', margin: '0 0 4px' }
@@ -133,14 +133,21 @@ export default function TransferPage() {
               </div>
             )}
 
-            {schedule && (
-              <div style={{ marginBottom: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: '0.9rem 1rem' }}>
-                <p style={{ margin: '0 0 0.6rem', fontSize: '0.78rem', fontWeight: 700, color: '#374151' }}>{t.scheduleTitle}</p>
-                <p style={{ margin: '0 0 0.2rem', fontSize: '0.8rem', color: '#6b7280' }}>{t.arrivalScheduleLabel} — {formatTransferDateTime(schedule.arrivalDateTime, person?.locale ?? 'en')}</p>
-                <p style={{ margin: '0 0 0.5rem', fontSize: '0.72rem', color: '#9ca3af' }}>{t.whatsappNote}</p>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>{t.departureScheduleLabel} — {formatTransferDateTime(schedule.departureDateTime, person?.locale ?? 'en')}</p>
-              </div>
-            )}
+            {schedule && (() => {
+              const loc = person?.locale ?? 'en'
+              return (
+                <div style={{ marginBottom: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, padding: '0.9rem 1rem' }}>
+                  <p style={{ margin: '0 0 0.7rem', fontSize: '0.78rem', fontWeight: 700, color: '#374151' }}>{t.scheduleTitle}</p>
+                  <p style={{ margin: '0 0 0.3rem', fontSize: '0.85rem', color: '#374151', fontWeight: 600 }}>
+                    {formatTransferLegLine(schedule.arrivalDateTime, arrivalRouteLabel(schedule, loc), loc)}
+                  </p>
+                  <p style={{ margin: '0 0 1rem', fontSize: '0.72rem', color: '#9ca3af' }}>{t.whatsappNote}</p>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#374151', fontWeight: 600 }}>
+                    {formatTransferLegLine(schedule.departureDateTime, departureRouteLabel(schedule, loc), loc)}
+                  </p>
+                </div>
+              )
+            })()}
 
             {/* Arrival */}
             <div style={{ marginBottom: '1.5rem' }}>

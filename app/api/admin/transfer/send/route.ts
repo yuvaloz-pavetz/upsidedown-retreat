@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { ELIGIBLE_LEAD_STATUSES, getTransferSchedule, formatTransferDateTime } from '@/lib/transfer-config'
+import { ELIGIBLE_LEAD_STATUSES, getTransferSchedule, formatTransferLegLine, arrivalRouteLabel, departureRouteLabel } from '@/lib/transfer-config'
 import crypto from 'crypto'
 
 async function requireAdmin() {
@@ -17,21 +17,31 @@ const LOGO = 'https://upsidedown-retreat.com/images/UpsideDown%20Retreat%20-%20L
 
 type Kind = 'initial' | 'reminder' | 'test'
 
-function scheduleLine(eventSlug: string, locale: string): string {
+// A boxed, line-broken schedule — date first, then route, then time — kept
+// visually separate from the running sentence so the two legs read clearly
+// as two distinct trips, not one run-on sentence.
+function scheduleBlockHtml(eventSlug: string, locale: string): string {
   const schedule = getTransferSchedule(eventSlug)
   if (!schedule) return ''
-  const arrival = formatTransferDateTime(schedule.arrivalDateTime, locale)
-  const departure = formatTransferDateTime(schedule.departureDateTime, locale)
-  return locale === 'he'
-    ? `הסעת הגעה — ${schedule.airport} ← החווה — ${arrival} (המיקום המדויק יישלח בקבוצת הוואטסאפ). הסעת עזיבה — החווה ← ${schedule.airport} — ${departure}`
-    : `Arrival transfer — ${schedule.airport} → the farm — ${arrival} (exact meeting point shared in the WhatsApp group). Departure transfer — the farm → ${schedule.airport} — ${departure}`
+  const arrivalLine = formatTransferLegLine(schedule.arrivalDateTime, arrivalRouteLabel(schedule, locale), locale)
+  const departureLine = formatTransferLegLine(schedule.departureDateTime, departureRouteLabel(schedule, locale), locale)
+  const whatsappNote = locale === 'he'
+    ? 'המיקום המדויק יישלח בקבוצת הוואטסאפ קרוב יותר לתאריך.'
+    : 'Exact meeting point will be shared in the WhatsApp group closer to the date.'
+  const align = locale === 'he' ? 'right' : 'left'
+  return `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px 18px;margin:0 0 28px;text-align:${align}">
+      <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#374151">${arrivalLine}</p>
+      <p style="margin:0 0 16px;font-size:12px;color:#9ca3af">${whatsappNote}</p>
+      <p style="margin:0;font-size:14px;font-weight:700;color:#374151">${departureLine}</p>
+    </div>`
 }
 
 function emailEn(firstName: string, url: string, kind: Kind, eventSlug: string) {
   const heading = kind === 'reminder' ? "Reminder — let us know about your airport transfer" : 'Need a lift to or from the airport?'
   const body = kind === 'reminder'
     ? `We haven't heard back from you yet about the airport transfer. Let us know if you need a seat — it only takes a minute.`
-    : `We run a group transfer to and from the airport for the retreat. ${scheduleLine(eventSlug, 'en')}. Let us know if you'd like a seat on either ride — it only takes a minute.`
+    : `We run a group transfer to and from the airport for the retreat — here's the fixed schedule. Let us know if you'd like a seat on either ride — it only takes a minute.`
+  const schedule = kind === 'reminder' ? '' : scheduleBlockHtml(eventSlug, 'en')
   return {
     subject: kind === 'reminder' ? 'Reminder: airport transfer for the retreat' : 'Airport transfer for the retreat',
     html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -46,7 +56,8 @@ function emailEn(firstName: string, url: string, kind: Kind, eventSlug: string) 
   <div style="background:#ffffff;padding:40px">
     <h2 style="margin:0 0 14px;color:#0B1D2A;font-size:21px;font-weight:700">Hi ${firstName},</h2>
     <p style="color:#555;line-height:1.75;margin:0 0 14px;font-size:15px">${heading}</p>
-    <p style="color:#555;line-height:1.75;margin:0 0 32px;font-size:15px">${body}</p>
+    <p style="color:#555;line-height:1.75;margin:0 0 20px;font-size:15px">${body}</p>
+    ${schedule}
     <div style="text-align:center;margin-bottom:32px">
       <a href="${url}" style="display:inline-block;background:#D4A853;color:#0B1D2A;padding:15px 38px;text-decoration:none;font-weight:700;border-radius:5px;font-size:15px;letter-spacing:0.03em">
         Tell us your plans →
@@ -70,7 +81,8 @@ function emailHe(firstName: string, url: string, kind: Kind, eventSlug: string) 
   const heading = kind === 'reminder' ? 'תזכורת — נשמח לדעת לגבי ההסעה שלכם' : 'צריכים הסעה משדה התעופה?'
   const body = kind === 'reminder'
     ? 'עדיין לא קיבלנו תשובה מכם לגבי ההסעה משדה התעופה. ספרו לנו אם תרצו מקום — זה לוקח דקה.'
-    : `אנחנו מפעילים הסעה קבוצתית משדה התעופה ובחזרה אליו לריטריט. ${scheduleLine(eventSlug, 'he')}. ספרו לנו אם תרצו מקום באחת הנסיעות או בשתיהן — זה לוקח דקה.`
+    : 'אנחנו מפעילים הסעה קבוצתית משדה התעופה ובחזרה אליו לריטריט — הנה לוח הזמנים הקבוע. ספרו לנו אם תרצו מקום באחת הנסיעות או בשתיהן — זה לוקח דקה.'
+  const schedule = kind === 'reminder' ? '' : scheduleBlockHtml(eventSlug, 'he')
   return {
     subject: kind === 'reminder' ? 'תזכורת: הסעה משדה התעופה לריטריט' : 'הסעה משדה התעופה לריטריט',
     html: `<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -85,7 +97,8 @@ function emailHe(firstName: string, url: string, kind: Kind, eventSlug: string) 
   <div style="background:#ffffff;padding:40px;direction:rtl;text-align:right">
     <h2 style="margin:0 0 14px;color:#0B1D2A;font-size:21px;font-weight:700">שלום ${firstName},</h2>
     <p style="color:#555;line-height:1.85;margin:0 0 14px;font-size:15px">${heading}</p>
-    <p style="color:#555;line-height:1.85;margin:0 0 32px;font-size:15px">${body}</p>
+    <p style="color:#555;line-height:1.85;margin:0 0 20px;font-size:15px">${body}</p>
+    ${schedule}
     <div style="text-align:center;margin-bottom:32px">
       <a href="${url}" style="display:inline-block;background:#D4A853;color:#0B1D2A;padding:15px 38px;text-decoration:none;font-weight:700;border-radius:5px;font-size:15px">
         → שליחת התוכניות שלי
