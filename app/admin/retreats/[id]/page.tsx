@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import AdminShell from '@/components/admin/AdminShell'
+import RetreatParticipants from '@/components/admin/RetreatParticipants'
 import type { RetreatRow } from '@/lib/supabase/types'
 
 interface Props {
@@ -94,6 +95,13 @@ export default async function RetreatHubPage({ params }: Props) {
             {label}
           </Link>
         ))}
+      </div>
+
+      <div style={{ marginTop: '2.5rem' }}>
+        <h2 style={{ fontSize: '0.95rem', fontWeight: 500, color: '#e2e8f0', marginBottom: '1rem' }}>
+          Registrations
+        </h2>
+        <RetreatParticipants slug={retreat.slug} />
       </div>
     </AdminShell>
   )
