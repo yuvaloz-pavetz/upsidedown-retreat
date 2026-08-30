@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 
@@ -38,7 +39,9 @@ const headStyle: React.CSSProperties = {
   paddingBottom: '0.5rem',
 }
 
-export default function CustomersPage() {
+function CustomersPageInner() {
+  const searchParams = useSearchParams()
+  const eventParam = searchParams.get('event')
   const [retreats, setRetreats] = useState<RetreatSummary[]>([])
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
   const [entries, setEntries] = useState<WaitlistEntry[]>([])
@@ -69,6 +72,11 @@ export default function CustomersPage() {
       .order('created_at', { ascending: true })
     setEntries((data ?? []) as WaitlistEntry[])
   }, [])
+
+  useEffect(() => {
+    if (eventParam && !selectedSlug && retreats.some(r => r.slug === eventParam)) void loadEntries(eventParam)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retreats])
 
   async function handleNotify() {
     if (!selectedSlug) return
@@ -276,5 +284,13 @@ export default function CustomersPage() {
         </div>
       </div>
     </AdminShell>
+  )
+}
+
+export default function CustomersPage() {
+  return (
+    <Suspense fallback={null}>
+      <CustomersPageInner />
+    </Suspense>
   )
 }

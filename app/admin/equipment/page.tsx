@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import AdminShell from '@/components/admin/AdminShell'
 
 const GEAR_LABEL: Record<string, string> = {
@@ -47,7 +48,9 @@ function gearNeeded(lead: IntakeLead): string[] {
   return ALL_GEAR.filter(g => !has.includes(g))
 }
 
-export default function EquipmentPage() {
+function EquipmentPageInner() {
+  const searchParams = useSearchParams()
+  const eventParam = searchParams.get('event')
   const [leads, setLeads] = useState<IntakeLead[]>([])
   const [events, setEvents] = useState<string[]>([])
   const [selectedEvent, setSelectedEvent] = useState('')
@@ -63,9 +66,11 @@ export default function EquipmentPage() {
         setLeads(rows)
         const slugs = [...new Set(rows.map(r => r.event_slug))].sort()
         setEvents(slugs)
-        if (slugs.length > 0) setSelectedEvent(slugs[0])
+        if (eventParam && slugs.includes(eventParam)) setSelectedEvent(eventParam)
+        else if (slugs.length > 0) setSelectedEvent(slugs[0])
         setLoading(false)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const filtered = leads.filter(l => l.event_slug === selectedEvent)
@@ -327,5 +332,13 @@ export default function EquipmentPage() {
         )}
       </div>
     </AdminShell>
+  )
+}
+
+export default function EquipmentPage() {
+  return (
+    <Suspense fallback={null}>
+      <EquipmentPageInner />
+    </Suspense>
   )
 }

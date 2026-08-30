@@ -95,8 +95,10 @@ export default async function RetreatsListPage() {
               return (
                 <tr key={r.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                   <td style={{ padding: '1rem', color: '#e2e8f0' }}>
-                    <div style={{ fontWeight: 500 }}>{r.title_en}</div>
-                    <div style={{ color: 'rgba(226,232,240,0.35)', fontSize: '0.78rem', marginTop: '2px' }}>{r.slug}</div>
+                    <Link href={`/admin/retreats/${r.id}`} style={{ color: '#e2e8f0', textDecoration: 'none' }}>
+                      <div style={{ fontWeight: 500 }}>{r.title_en}</div>
+                      <div style={{ color: 'rgba(226,232,240,0.35)', fontSize: '0.78rem', marginTop: '2px' }}>{r.slug}</div>
+                    </Link>
                   </td>
                   <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)', fontSize: '0.82rem' }}>{r.dates_en}</td>
                   <td style={{ padding: '1rem', color: 'rgba(226,232,240,0.65)' }}>

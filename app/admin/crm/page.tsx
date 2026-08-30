@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 import PaymentsPanel from '@/components/admin/PaymentsPanel'
@@ -134,7 +135,9 @@ const BLANK_CONTACT = { first_name: '', last_name: '', email: '', phone: '', not
 const BLANK_EVENT_ROW = { slug: '', status: 'interested' as LeadStatus, amount: '' }
 const BLANK_COMPANION = { first_name: '', last_name: '', email: '', locale: 'en' }
 
-export default function CRMPage() {
+function CRMPageInner() {
+  const searchParams = useSearchParams()
+  const eventParam = searchParams.get('event')
   const [events, setEvents] = useState<EventSummary[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
@@ -181,6 +184,11 @@ export default function CRMPage() {
     const json = await res.json() as { leads?: Lead[] }
     setLeads(json.leads ?? [])
   }, [])
+
+  useEffect(() => {
+    if (eventParam && selectedSlug === null && events.some(e => e.slug === eventParam)) void loadLeads(eventParam)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [events])
 
   function switchView(v: 'events' | 'contacts') {
     setView(v)
@@ -811,5 +819,13 @@ export default function CRMPage() {
         />
       )}
     </AdminShell>
+  )
+}
+
+export default function CRMPage() {
+  return (
+    <Suspense fallback={null}>
+      <CRMPageInner />
+    </Suspense>
   )
 }

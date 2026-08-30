@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 import type { BudgetItem, Payment } from '@/lib/supabase/types'
@@ -378,7 +379,9 @@ function BudgetSection({ type, items, slug, rates, onAdd, onUpdate, onRemove }: 
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function BudgetPage() {
+function BudgetPageInner() {
+  const searchParams = useSearchParams()
+  const eventParam = searchParams.get('event')
   const supabase = useMemo(() => createClient(), [])
   const [retreats, setRetreats]     = useState<RetreatSummary[]>([])
   const [selected, setSelected]     = useState<string | null>(null)
@@ -412,6 +415,11 @@ export default function BudgetPage() {
     const allLeads = leadsRes.leads ?? []
     setPaidLeads(allLeads.filter(l => l.status === 'paid' || l.status === 'partially_paid'))
   }, [supabase])
+
+  useEffect(() => {
+    if (eventParam && !selected && retreats.some(r => r.slug === eventParam)) void loadItems(eventParam)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retreats])
 
   function exportCSV() {
     if (!items.length || !selected) return
@@ -508,5 +516,13 @@ export default function BudgetPage() {
         )}
       </div>
     </AdminShell>
+  )
+}
+
+export default function BudgetPage() {
+  return (
+    <Suspense fallback={null}>
+      <BudgetPageInner />
+    </Suspense>
   )
 }

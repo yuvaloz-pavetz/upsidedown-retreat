@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import AdminShell from '@/components/admin/AdminShell'
 import { ELIGIBLE_LEAD_STATUSES, getTransferSchedule, formatTransferDateTime } from '@/lib/transfer-config'
 
@@ -55,7 +56,9 @@ function yesNo(v: boolean | null | undefined): React.ReactNode {
   return <span style={noTag}>—</span>
 }
 
-export default function TransfersAdminPage() {
+function TransfersAdminPageInner() {
+  const searchParams = useSearchParams()
+  const eventParam = searchParams.get('event')
   const [people, setPeople] = useState<Person[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState('')
@@ -84,7 +87,8 @@ export default function TransfersAdminPage() {
         const rows = j.leads ?? []
         setPeople(rows)
         const slugs = [...new Set(rows.map(r => r.event_slug))].sort()
-        if (slugs.length > 0 && !selectedEvent) setSelectedEvent(slugs[0])
+        if (eventParam && slugs.includes(eventParam) && !selectedEvent) setSelectedEvent(eventParam)
+        else if (slugs.length > 0 && !selectedEvent) setSelectedEvent(slugs[0])
         setLoading(false)
       })
   }
@@ -454,5 +458,13 @@ export default function TransfersAdminPage() {
         )}
       </div>
     </AdminShell>
+  )
+}
+
+export default function TransfersAdminPage() {
+  return (
+    <Suspense fallback={null}>
+      <TransfersAdminPageInner />
+    </Suspense>
   )
 }
